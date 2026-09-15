@@ -1,0 +1,117 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[top=17mm,bottom=16mm,left=20mm,right=20mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\pagestyle{empty}
+
+\definecolor{ink}{HTML}{202124}
+\definecolor{muted}{HTML}{666666}
+\definecolor{rule}{HTML}{B8BDC5}
+\definecolor{panel}{HTML}{F4F5F7}
+
+\newcommand{\field}[1]{\textcolor{muted}{\textit{[#1]}}}
+\newcommand{\smallcapslabel}[1]{{\sffamily\bfseries\footnotesize\MakeUppercase{#1}}}
+
+\begin{document}
+\color{ink}
+
+% Header
+\noindent
+\begin{minipage}[t]{0.56\textwidth}
+{\sffamily\bfseries\Large \field{Nom du bailleur / de la société propriétaire}}\\[2pt]
+{\small \field{Forme juridique, le cas échéant}}\\
+{\small \field{Adresse du bailleur}}\\
+{\small \field{Code postal - Ville}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.38\textwidth}
+\raggedleft
+{\small \smallcapslabel{Contact}}\\[3pt]
+{\small Tél. : \field{numéro}}\\
+{\small Email : \field{adresse email}}\\
+{\small SIREN : \field{si applicable}}
+\end{minipage}
+
+\vspace{6mm}
+\noindent\color{rule}\rule{\textwidth}{0.6pt}\color{ink}
+
+\vspace{7mm}
+\begin{center}
+{\sffamily\bfseries\LARGE ATTESTATION}\\[4pt]
+{\sffamily\bfseries\large Interdiction d'installation d'une enseigne permanente}
+\end{center}
+
+\vspace{6mm}
+
+\noindent
+\begin{tabularx}{\textwidth}{>{\bfseries}l X}
+Date : & \field{JJ mois AAAA} \\
+Objet : & Absence d'autorisation d'enseigne permanente \\
+Local concerné : & \field{adresse exacte du local / lieu d'activité} \\
+Occupant / entreprise : & AQUAFIX \field{raison sociale exacte, si différente} \\
+\end{tabularx}
+
+\vspace{6mm}
+
+Madame, Monsieur,
+
+\vspace{3mm}
+
+Je soussigné(e), \field{nom et prénom}, agissant en qualité de \field{propriétaire / gérant / mandataire / gestionnaire} de \field{nom du bailleur ou de la société propriétaire}, atteste que l'occupant du local situé \field{adresse exacte} n'est pas autorisé à installer une enseigne permanente sur la façade ou sur les parties extérieures de l'immeuble sans autorisation écrite préalable.
+
+\vspace{3mm}
+
+Cette interdiction résulte de \field{la clause n\textsuperscript{o} X du bail / du règlement de copropriété / des règles de l'immeuble}. Elle vise notamment toute enseigne, plaque, panneau, dispositif publicitaire, adhésif extérieur ou support fixé de manière permanente sur la façade, le portail, la clôture, les parties communes ou tout autre élément extérieur visible depuis la voie publique.
+
+\vspace{3mm}
+
+En conséquence, aucune signalétique permanente ne peut être apposée par AQUAFIX à cette adresse sans accord écrit préalable du bailleur et, le cas échéant, de la copropriété ou de son syndic.
+
+\vspace{3mm}
+
+La présente attestation est délivrée à la demande de l'occupant afin de confirmer cette restriction applicable au local précité.
+
+\vspace{5mm}
+
+Fait à \field{ville}, le \field{date}.
+
+\vspace{7mm}
+
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+{\bfseries Nom du signataire :} \field{nom}\\[3pt]
+{\bfseries Qualité :} \field{fonction}\\[8pt]
+{\bfseries Signature :}\\[11mm]
+\field{signature manuscrite du bailleur / gestionnaire}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.44\textwidth}
+\setlength{\fboxsep}{6pt}
+\colorbox{panel}{%
+\begin{minipage}{0.92\linewidth}
+\small
+\textbf{Coordonnées du bailleur / gestionnaire}\\[3pt]
+\field{nom / raison sociale}\\
+\field{adresse}\\
+\field{téléphone}\\
+\field{email}\\
+\field{SIREN, si applicable}
+\end{minipage}}
+\end{minipage}
+
+\vspace{5mm}
+\noindent\color{rule}\rule{\textwidth}{0.5pt}\color{muted}
+\vspace{2mm}
+{\footnotesize\sffamily MODÈLE - à faire compléter et signer par le bailleur, le propriétaire ou le gestionnaire réel. Les mentions relatives au bail ou au règlement doivent correspondre aux documents effectivement applicables.}
+
+\end{document}
