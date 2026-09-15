@@ -14,9 +14,22 @@
   today - duration(days: calc.rem(calc.floor(r / 4096), window + 1))
 }
 
-#let _fr-months = ("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre")
+// Doubles as Typst's own `text(lang:)` codes.
+#let langs = ("fr", "en")
 
-#let fr-date(d) = {
-  let day = if d.day() == 1 { "1er" } else { str(d.day()) }
-  day + " " + _fr-months.at(d.month() - 1) + " " + str(d.year())
+// Documents hold their text keyed by language. A half-translated one fails here,
+// rather than on the day someone renders the language that is missing.
+#let tr(strings, lang) = {
+  assert.eq(strings.keys().sorted(), langs.sorted(), message: "document covers " + repr(strings.keys()) + ", not " + repr(langs))
+  strings.at(lang)
+}
+
+#let _months = (
+  fr: ("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"),
+  en: ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"),
+)
+
+#let format-date(d, lang) = {
+  let day = if lang == "fr" and d.day() == 1 { "1er" } else { str(d.day()) }
+  day + " " + _months.at(lang).at(d.month() - 1) + " " + str(d.year())
 }
