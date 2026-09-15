@@ -41,7 +41,6 @@
         #text(size: 9pt)[SIREN : #siren]
       ]
     ],
-  ),
   )
   #v(6mm)
   #line(length: 100%, stroke: 0.6pt + rule)
@@ -85,10 +84,9 @@
     align: (left, top),
     [
       #text(weight: "bold")[Signature :] \
-      #v(3mm)
-      #text(font: "Nanum Pen", size: 24pt, fill: rgb("182b55"), baseline: -2pt)[Jean Dupont] \
-      #line(length: 44mm, stroke: 0.7pt + rgb("182b55")) \
-      #v(3mm)
+      #v(1mm)
+      #image("signature.png", width: 42mm) \
+      #v(2mm)
       #text(weight: "bold")[#signataire] \
       #text()[#qualite] \
       #text()[#proprietaire]
