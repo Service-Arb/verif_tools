@@ -19,22 +19,47 @@
   datetime.today() - duration(days: calc.rem(calc.floor(_rand(seed) / 4096), window + 1))
 }
 
+// Doubles every second digit from the right, the rightmost one left alone. A
+// number passes when this comes out a multiple of 10.
+#let _luhn-sum(digits) = {
+  let total = 0
+  for (i, d) in digits.rev().enumerate() {
+    let d = if calc.odd(i) { d * 2 } else { d }
+    total += if d > 9 { d - 9 } else { d }
+  }
+  total
+}
+
 // Digits in the shape the code is written in: `(3, 3, 3)` reads back as
-// "123 456 789". Typst has no tuple, so the shape is an array.
-// ponytail: an LCG's digits, which no registry's checksum will accept — carry the
-// real number if the document has to survive a lookup.
-#let digit-code(groups, seed: 0) = {
+// "123 456 789". Typst has no tuple, so the shape is an array. The last digit
+// checks the rest, as SIREN, IBAN and card numbers all do.
+// ponytail: shape and checksum, nothing behind them — carry the real number if
+// the document has to survive a lookup.
+#let digit-code(groups, seed: 0, luhn: true) = {
   assert(groups.len() > 0, message: "a code of no groups")
-  let x = _rand(seed)
-  let out = ()
   for n in groups {
     assert(n > 0, message: "a group of " + str(n) + " digits")
-    let group = ""
-    for _ in range(n) {
-      x = _lcg(x)
-      group += str(_digit(x))
-    }
-    out.push(group)
+  }
+  let total = groups.sum()
+  assert(not luhn or total > 1, message: "a code of one digit has nothing to check")
+
+  let x = _rand(seed)
+  let digits = ()
+  for _ in range(if luhn { total - 1 } else { total }) {
+    x = _lcg(x)
+    digits.push(_digit(x))
+  }
+  // the check digit sits where it contributes itself, so summing over a 0 in its
+  // place gives the amount it has to make up
+  if luhn {
+    digits.push(calc.rem(10 - calc.rem(_luhn-sum(digits + (0,)), 10), 10))
+  }
+
+  let out = ()
+  let cut = 0
+  for n in groups {
+    out.push(digits.slice(cut, cut + n).map(str).join())
+    cut += n
   }
   out.join(" ")
 }

@@ -27,6 +27,27 @@
 #assert(range(20).map(s => digit-code((3, 3, 3), seed: s)).dedup().len() > 15)
 // and the digits inside one code have to move too
 #assert(digit-code((9,)).clusters().dedup().len() > 3)
+
+// read back the way a registry reads it, off the printed string, and by its own
+// arithmetic rather than the one that wrote it
+#let luhn-ok(code) = {
+  let total = 0
+  for (i, d) in code.replace(" ", "").clusters().map(int).rev().enumerate() {
+    let d = if calc.odd(i) { d * 2 } else { d }
+    total += if d > 9 { d - 9 } else { d }
+  }
+  calc.rem(total, 10) == 0
+}
+#assert(luhn-ok("79927398713"), message: "the check the test brought is wrong")
+#for wrong in range(10).filter(d => d != 3) {
+  assert(not luhn-ok("7992739871" + str(wrong)))
+}
+#for s in range(50) {
+  let code = digit-code((3, 3, 3), seed: s)
+  assert(luhn-ok(code), message: code + " does not check out")
+}
+#assert(luhn-ok(digit-code((2,), seed: 7)))
+#assert.eq(digit-code((3, 3, 3), seed: 0, luhn: false).split(" ").map(g => g.len()), (3, 3, 3))
 #for l in langs {
   assert(type(format-date(today, l)) == str)
 }
