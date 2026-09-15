@@ -1,4 +1,4 @@
-#import "/utils.typ": format-date, tr
+#import "../utils.typ": digit-code, format-date, tr
 
 #let adresse_bailleur = "12 rue des Carmes, 63000 Clermont-Ferrand, France"
 #let ville = "Clermont-Ferrand"
@@ -6,7 +6,7 @@
 #let forme_juridique = "Société civile immobilière"
 #let telephone = "04 73 00 00 00"
 #let email = "contact@lesvolcans-immo.fr"
-#let siren = "123 456 789"
+#let siren = digit-code((3, 3, 3))
 #let signataire = "Jean Dupont"
 
 #let attestation(lang: "fr", proprietaire: none, date: none) = {

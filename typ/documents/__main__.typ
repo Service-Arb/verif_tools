@@ -1,5 +1,5 @@
-// typst compile --root .. documents/__main__.typ out.pdf
-#import "/utils.typ": langs, recent-date
+// typst compile --root typ typ/documents/__main__.typ out.pdf
+#import "../utils.typ": langs, recent-date
 #import "attestation_interdiction_enseigne.typ": attestation
 
 #let lang = "fr"

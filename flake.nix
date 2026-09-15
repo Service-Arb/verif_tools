@@ -63,9 +63,11 @@
           exec typst compile __main__.typ output.pdf
         '';
 
-        # Every .typ under typ/ compiles to the same path under $out. The letters
-        # are cut to a measured size, so the fonts are pinned rather than the
-        # builder's — --ignore-system-fonts makes a missing one an error.
+        # Every .typ under typ/print compiles to the same path under $out. The
+        # letters are cut to a measured size, so the fonts are pinned rather than
+        # the builder's — --ignore-system-fonts makes a missing one an error.
+        # typ/documents stays out: it dates itself off the clock, which the build
+        # sandbox pins to the epoch.
         packages.typ = pkgs.stdenvNoCC.mkDerivation {
           name = "${pname}-typ";
           src = ./typ;
@@ -73,9 +75,9 @@
           nativeBuildInputs = [ pkgs.typst ];
 
           buildPhase = ''
-            find . -name '*.typ' -print0 | while IFS= read -r -d ''' f; do
+            find ./print -name '*.typ' -print0 | while IFS= read -r -d ''' f; do
               mkdir -p "$out/$(dirname "$f")"
-              typst compile --ignore-system-fonts \
+              typst compile --root . --ignore-system-fonts \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
                 "$f" "$out/''${f%.typ}.pdf"
             done
