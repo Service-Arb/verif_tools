@@ -63,6 +63,27 @@
           exec typst compile __main__.typ output.pdf
         '';
 
+        # Every .typ under typ/ compiles to the same path under $out. The letters
+        # are cut to a measured size, so the fonts are pinned rather than the
+        # builder's — --ignore-system-fonts makes a missing one an error.
+        packages.typ = pkgs.stdenvNoCC.mkDerivation {
+          name = "${pname}-typ";
+          src = ./typ;
+
+          nativeBuildInputs = [ pkgs.typst ];
+
+          buildPhase = ''
+            find . -name '*.typ' -print0 | while IFS= read -r -d ''' f; do
+              mkdir -p "$out/$(dirname "$f")"
+              typst compile --ignore-system-fonts \
+                --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
+                "$f" "$out/''${f%.typ}.pdf"
+            done
+          '';
+
+          dontInstall = true;
+        };
+
         packages.default = pkgs.stdenvNoCC.mkDerivation {
           name = "${pname}-document";
           src = ./.;
