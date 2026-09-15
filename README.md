@@ -1,6 +1,20 @@
 # verif_tools
 ![Lines Of Code](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/valeratrades/b48e6f02c61942200e7d1e3eeabf9bcb/raw/verif_tools-loc.json)
 
+TODO
+<!-- markdownlint-disable -->
+<details>
+<summary>
+<h2>Installation</h2>
+</summary>
+
+TODO
+
+</details>
+<!-- markdownlint-restore -->
+
+## Usage
+TODO
 
 
 
