@@ -63,11 +63,11 @@
           exec typst compile __main__.typ output.pdf
         '';
 
-        # Every .typ under typ/print compiles to the same path under $out. The
-        # letters are cut to a measured size, so the fonts are pinned rather than
-        # the builder's — --ignore-system-fonts makes a missing one an error.
-        # typ/documents stays out: it dates itself off the clock, which the build
-        # sandbox pins to the epoch.
+        # A .typ nothing else imports is a document, and compiles to the same path
+        # under $out; the rest are libraries, and typst would render them as a
+        # blank page rather than say so. The letters in print/ are cut to a
+        # measured size, so the fonts are pinned rather than the builder's —
+        # --ignore-system-fonts makes a missing one an error.
         packages.typ = pkgs.stdenvNoCC.mkDerivation {
           name = "${pname}-typ";
           src = ./typ;
@@ -75,7 +75,24 @@
           nativeBuildInputs = [ pkgs.typst ];
 
           buildPhase = ''
-            find ./print -name '*.typ' -print0 | while IFS= read -r -d ''' f; do
+            : > imported
+            for f in $(find . -name '*.typ'); do
+              for imp in $(grep -oE '"[^"]*\.typ"' "$f" | tr -d '"' || true); do
+                case "$imp" in
+                  /*) realpath -m ".$imp" >> imported ;;
+                  *) realpath -m "$(dirname "$f")/$imp" >> imported ;;
+                esac
+              done
+            done
+
+            # the documents date themselves off the clock, and the sandbox pins
+            # SOURCE_DATE_EPOCH to 1970 — utils.typ refuses to render that year
+            # ponytail: nix caches on inputs, so the date is the one the store path
+            # was first built on; `__impure = true` if it has to follow the day
+            unset SOURCE_DATE_EPOCH
+
+            for f in $(find . -name '*.typ'); do
+              if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
               mkdir -p "$out/$(dirname "$f")"
               typst compile --root . --ignore-system-fonts \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
