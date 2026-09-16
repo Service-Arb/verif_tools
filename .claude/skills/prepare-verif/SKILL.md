@@ -7,7 +7,7 @@ description: Turn an address into a printable verification pack — write exampl
 
 ## 1. Collect what cannot be looked up
 
-From the conversation, or from a half-written `examples/*.typ` the user points at:
+From the conversation, or from a half-written place file the user points at:
 
 | field | |
 | --- | --- |
@@ -33,15 +33,17 @@ up nothing.
 
 ## 3. Write the place
 
-`examples/<business>_-_<city>_-_<branch>.typ`, shaped like the file already there.
-`typ/__main__.typ` holds the asserts it has to satisfy. In a competitor's name,
+`tmp/<business>_-_<city>_-_<branch>.typ`, shaped like the file under `examples/`
+— `tmp/` is untracked, so a real door does not land in the repo unless the user
+asks for it. `typ/__main__.typ` holds the asserts it has to satisfy. In a
+competitor's name,
 `\n` is where its board breaks the line, and everything after it sets smaller —
 put the trade suffix there (`"CLO\nCoffee Co."`).
 
 ## 4. Build
 
 ```sh
-nix run . -- examples/<place>.typ     # every sheet, in tray order
+nix run . -- tmp/<place>.typ     # every sheet, in tray order
 ```
 
 Show the user the PDF path and what is on it: the street letters to cut out, the

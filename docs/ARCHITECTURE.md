@@ -10,7 +10,7 @@ its shape, and is what every sheet imports.
 ```mermaid
 flowchart LR
     A["address, trade"] --> N["scripts/nearby.py<br/>Nominatim, Overpass"]
-    N --> P["examples/place.typ"]
+    N --> P["tmp/place.typ"]
     P -->|--input place=| M["typ/__main__.typ"]
     M --> S["typ/signs/*"]
     M --> D["typ/documents/*"]

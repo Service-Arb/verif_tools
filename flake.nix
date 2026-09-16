@@ -36,12 +36,12 @@
         # checkout draws any number of doors. Typst resolves it against --root.
         build = pkgs.writeShellScriptBin "build" ''
           set -eu
-          place="''${1:?usage: build <examples/place.typ> [out.pdf]}"
+          place="''${1:?usage: build <tmp/place.typ> [out.pdf]}"
           test -f "$place" || { echo "no such place: $place" >&2; exit 1; }
           # the devShell pins it, and utils.typ refuses to date a document 1980
           unset SOURCE_DATE_EPOCH
           exec ${pkgs.typst}/bin/typst compile --root . --input place="/''${place#/}" \
-            typ/to_print.typ "''${2:-$(basename "''${place%.typ}").pdf}"
+            typ/to_print.typ "''${2:-''${place%.typ}.pdf}"
         '';
         exampleplace = "/examples/aquafix_-_Clermont-Ferrand_-_North.typ";
       in
@@ -50,7 +50,7 @@
           type = "app";
           program = "${pkgs.writeShellScriptBin "help" ''
             cat <<EOF
-            nix run . -- examples/<place>.typ   Every sheet for that door, in tray order
+            nix run . -- tmp/<place>.typ        Every sheet for that door, in tray order
             nix build .#typ                     Each document on its own, off the example place
             nix develop                         Enter the Typst development shell
             EOF
