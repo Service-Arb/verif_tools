@@ -98,6 +98,6 @@
     columns: (1fr, 0.92fr),
     gutter: 16pt,
     align: (left, top),
-    signature(lang, s.signature), coordonnees(lang),
+    signature(s.signature), coordonnees(lang),
   )
 }

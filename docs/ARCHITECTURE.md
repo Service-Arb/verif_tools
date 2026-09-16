@@ -1,8 +1,8 @@
 # Architecture
 
-One door's worth of paper: a street plate to cut out, a landlord's attestation,
-the plaques of the neighbour and of the other businesses nearby, and what the
-business hangs and hands out itself.
+One door's worth of paper: a street plate to cut out, the landlord's attestation
+and rent invoice, the plaques of the neighbour and of the other businesses
+nearby, and what the business hangs and hands out itself.
 
 A place is data, and the sources are not — nothing under `typ/` names a place
 file. `typ/__main__.typ` takes the one handed to it on the command line, asserts

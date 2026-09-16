@@ -17,8 +17,8 @@
 
 #let _words = lang => tr(
   (
-    fr: (contact: "CONTACT", tel: "Tél. : ", colon: " : ", qualite: "Gérant", panneau: "Coordonnées du bailleur / gestionnaire"),
-    en: (contact: "CONTACT", tel: "Phone: ", colon: ": ", qualite: "Manager", panneau: "Landlord / manager contact details"),
+    fr: (contact: "CONTACT", tel: "Tél. : ", colon: " : ", panneau: "Coordonnées du bailleur / gestionnaire"),
+    en: (contact: "CONTACT", tel: "Phone: ", colon: ": ", panneau: "Landlord / manager contact details"),
   ),
   lang,
 )
@@ -60,12 +60,12 @@
   ]
 }
 
-#let signature(lang, label) = [
+// The scan carries the name and the qualité under the hand, so nothing is set
+// under it but who the hand signs for.
+#let signature(label) = [
   #text(weight: "bold")[#label] \
   #v(1mm)
   #image("/assets/signature.png", width: 42mm) \
-  #v(2mm)
-  #text(weight: "bold")[#signataire] \
-  #text()[#_words(lang).qualite] \
+  #v(1mm)
   #text()[#proprietaire]
 ]

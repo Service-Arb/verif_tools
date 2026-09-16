@@ -151,7 +151,7 @@
       #v(1.5mm)
       #format-date(debut, lang) — #format-date(fin, lang) \
       #v(1.5mm)
-      #strong[#s.local] #h(1fr) \
+      #strong[#s.local] \
       #adresse_local
     ],
   )
@@ -193,6 +193,6 @@
     columns: (1fr, 0.92fr),
     gutter: 16pt,
     align: (left, top),
-    signature(lang, s.signature), coordonnees(lang),
+    signature(s.signature), coordonnees(lang),
   )
 }
