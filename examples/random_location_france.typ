@@ -13,9 +13,10 @@
 )
 
 #let nearby = (
-  // One plaque each. A "\n" is where that plaque breaks its line, and what
-  // follows is set smaller — where the trade suffix sits on a real one.
-  competitors: (
+  // The nearest doors that carry a name of their own, whatever they sell. One
+  // plaque each. A "\n" is where that plaque breaks its line, and what follows is
+  // set smaller — where the trade suffix sits on a real one.
+  other_businesses: (
     "Freeman Law Center,\nLLC",
     "CLO\nCoffee Co.",
   ),

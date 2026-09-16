@@ -10,5 +10,5 @@
 #assert(lang in langs, message: repr(lang) + " is not one of " + repr(langs))
 #assert.eq(address.keys().sorted(), ("city", "name", "street"))
 #assert(nearby.print_my_address_n > 0, message: "no copies of the address plate asked for")
-#assert(nearby.competitors.len() > 0, message: "no competitor boards to draw")
+#assert(nearby.other_businesses.len() > 0, message: "no boards of other businesses to draw")
 #for n in nearby.neighbours { assert.eq(n.keys().sorted(), ("name", "street")) }

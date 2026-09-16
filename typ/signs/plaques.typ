@@ -68,10 +68,10 @@
   // lane between them is weak, so it collapses rather than pushing a row over.
   ((address,) + nearby.neighbours).map(a => range(nearby.print_my_address_n).map(_ => plate(a))).flatten().join(h(lane, weak: true))
 
-  // A competitor's board is the thing in the shot, so it gets a page to itself and
-  // prints as large as the paper allows — 90:62 is within a hair of landscape A4
-  // inside the margins, so scaling the drawn plaque up leaves almost nothing over.
-  for name in nearby.competitors {
+  // Another business's board is the thing in the shot, so it gets a page to itself
+  // and prints as large as the paper allows — 90:62 is within a hair of landscape
+  // A4 inside the margins, so scaling the drawn plaque up leaves almost nothing over.
+  for name in nearby.other_businesses {
     page(
       paper: "a4",
       flipped: true,
