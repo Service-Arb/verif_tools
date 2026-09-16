@@ -1,7 +1,8 @@
-// Cap height of the street-plate lettering, measured off a Lyon plaque (50x30cm
-// enamel, "AVENUE THIERS", 6eme arrt): the caps span 0.211 of the plate's height.
-// Override to calibrate against a plate you actually hold a ruler to.
-#let cap = eval(sys.inputs.at("cap", default: "6.3cm"))
+#import "../__main__.typ": street_plate
+
+// Measured off a Lyon plaque ("AVENUE THIERS", 6eme arrt): the caps span 0.211 of
+// the plate's height, whatever blank the plate is cut from.
+#let cap = 0.211 * street_plate.height
 // what a desktop printer refuses to reach, plus a lane to cut in
 #let margin = 10mm
 #let lane = 4mm

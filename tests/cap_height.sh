@@ -5,7 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-cap_mm=63
+place=/examples/aquafix_-_Clermont-Ferrand_-_Montjuzet.typ
+cap_mm=63 # 0.211 of that place's 30cm plate
 margin_mm=10
 ppi=300
 tol_mm=0.5
@@ -13,7 +14,7 @@ tol_mm=0.5
 out=$(mktemp -d)
 trap 'rm -rf "$out"' EXIT
 
-typst compile --ignore-system-fonts \
+typst compile --root . --ignore-system-fonts --input "place=$place" \
   --font-path "$(nix build nixpkgs#liberation_ttf --no-link --print-out-paths)/share/fonts/truetype" \
   --format png --ppi "$ppi" typ/signs/alphabet.typ "$out/p{p}.png"
 

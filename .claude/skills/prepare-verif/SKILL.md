@@ -13,8 +13,10 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | `proprietaire` | landlord on the attestation and the rent invoice |
 | `brand.name`, `brand.descriptor` | the business, and the trade and territory line under it |
 
-`lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2` and
-`brand.print_sheet_n` is `4` unless the user says otherwise.
+`lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
+`brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —
+the blank the street plate is cut from, and what sizes the letters — unless the
+user says otherwise.
 The rest of the letterhead — address, e-mail, SIREN, signatory — is fixed in
 `typ/documents/bailleur.typ` to `SCI Les Volcans`, so `proprietaire` is that name
 unless the user gives their own landlord.
@@ -65,9 +67,10 @@ a symlink into the store, not something to hand over.
 `typ/reusable/` is signs no place decides: the same ones hang on every door, so
 they are printed once rather than per pack, and `to_print.pdf` leaves them out.
 
-Read `typ/reusable/lib.typ` and list what it draws — one line each, in the user's
-`lang` — and ask them to confirm each is already on the door. Whatever is not:
+List what `typ/reusable/` holds — one line each, in the user's `lang`, read off
+the files rather than from memory — and ask them to confirm each is already on the
+door. Whatever is not:
 
 ```sh
-nix build .#typ && cp result/typ/reusable/__main__.pdf .   # each sign in each language, a page each
+nix build .#typ && cp result/typ/reusable/*.<lang>.pdf .
 ```

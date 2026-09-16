@@ -13,7 +13,7 @@ Which splits the sources in two, and a build is the query that picks a half:
 | | `nix build .#typ` | `nix build "path:.#<place>"` |
 | --- | --- | --- |
 | asks for | the stock, before there is a door | one door's `to_print.pdf` |
-| gets | the cut-out alphabet, the plate blue, `reusable/` | every sheet, specialized |
+| gets | the plate blue, `reusable/` | every sheet, specialized |
 | how it picks | the documents whose imports never reach `typ/__main__.typ` | all of them |
 
 Which half a document falls in is read off its imports rather than its path, so a

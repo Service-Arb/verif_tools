@@ -12,6 +12,10 @@
   city: "63100 Clermont-Ferrand",
 )
 
+// The enamel blank the street plate at this door is cut from. Its height sets how
+// tall the letters to cut out come off the paper; the width records the blank.
+#let street_plate = (width: 50cm, height: 30cm)
+
 // The business as its own paper calls it. For "Aquafix Plombier Chauffagiste -
 // Lyon, Nord", `name` is "Aquafix" and `descriptor` is everything after it.
 #let brand = (

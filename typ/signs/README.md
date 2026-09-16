@@ -17,12 +17,13 @@ A sheet is caps: `letters()` folds the name to upper case and drops the accents
 (French drops them at this size) and the house number, which belongs to the
 postal line rather than the plate.
 
-The cap height is measured off the reference photo of `6ème ARRᵗ / AVENUE THIERS`
-rather than specified anywhere: no national standard fixes it, and Lyon's plates
-are a municipal decision with no published charter. The plate in the photo is
-1.67:1, which is the 50×30cm enamel blank the émailleurs sell; the caps on it
-span 0.211 of its height at the same perspective, across three letters with flat
-tops and baselines — 6.3cm. `--input cap=6.5cm` if you get to hold a ruler to one.
+The place gives the blank its plate is cut from — `street_plate`, 50×30cm being
+what the émailleurs sell — and the caps are a fraction of its height, 0.211. That
+fraction is measured off the reference photo of `6ème ARRᵗ / AVENUE THIERS` rather
+than specified anywhere: no national standard fixes it, and Lyon's plates are a
+municipal decision with no published charter. The plate in the photo is 1.67:1, so
+the same blank, and three of its letters have flat tops and baselines to read the
+span across. 30cm of plate puts the caps at 6.3cm.
 
 Letters are adjacent with no gap, so the rows are packed by measurement in
 `cutout.typ`: Typst breaks lines at spaces, and there are none.
