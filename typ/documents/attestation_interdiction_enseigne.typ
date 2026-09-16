@@ -1,8 +1,9 @@
+#import "../config.typ": address
 #import "../utils.typ": digit-code, format-date, tr
 
 #let adresse_bailleur = "12 rue des Carmes, 63000 Clermont-Ferrand, France"
 #let ville = "Clermont-Ferrand"
-#let adresse_local = "23 avenue des Landais, 63100 Clermont-Ferrand"
+#let adresse_local = address.street + ", " + address.city
 #let forme_juridique = "Société civile immobilière"
 #let telephone = "04 73 00 00 00"
 #let email = "contact@lesvolcans-immo.fr"
