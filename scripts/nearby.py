@@ -5,7 +5,7 @@
 
 Neighbours are the two nearest street numbers on the same street; competitors are
 the nearest named POIs carrying `--trade`. Both come out as JSON, to be read and
-folded into an examples/<place>.typ by hand — OSM names a building far less often
+folded into a tmp/<place>.typ by hand — OSM names a building far less often
 than it names a shop, so the neighbour usually comes back without a `name`.
 """
 

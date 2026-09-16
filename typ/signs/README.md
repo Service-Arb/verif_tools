@@ -4,7 +4,7 @@ What hangs on a wall, printed on whatever A4 is in the office and cut out: a Lyo
 street plate, and the plaques of the place's `nearby`.
 
 ```sh
-nix build .#typ            # result/typ/signs/{background,alphabet,street,nearby}.pdf
+nix build "path:.#<place>" # result/typ/signs/{background,alphabet,street,nearby}.pdf
 ./tests/cap_height.sh      # the caps come off the paper at the size they claim
 ```
 

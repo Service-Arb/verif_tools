@@ -42,10 +42,15 @@ put the trade suffix there (`"CLO\nCoffee Co."`).
 
 ## 4. Build
 
+Always build — the pack, not the place file, is what the user asked for.
+
 ```sh
-nix run . -- tmp/<place>.typ     # every sheet, in tray order
+nix build "path:.#<place>"     # <place> is the file name without .typ
 ```
 
-Show the user the PDF path and what is on it: the street letters to cut out, the
+`path:` and not `.`, or nix builds from the git tree, which does not have `tmp/`
+in it. Every sheet lands in `result/typ/`, in tray order in `to_print.pdf`.
+
+Show the user that path and what is on it: the street letters to cut out, the
 attestation, our address plate tiled, the neighbour's plate, one competitor board
 per page.

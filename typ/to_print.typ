@@ -1,4 +1,4 @@
-// nix run . -- tmp/<place>.typ
+// nix build "path:.#<place>"
 // One pass through the printer, in tray order. Add to `sheets`; each entry opens
 // its own page, so nothing here has to know what sits above it.
 #import "__main__.typ": address, lang, proprietaire

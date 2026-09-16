@@ -32,45 +32,13 @@
           exec ${pkgs.typstyle}/bin/typstyle --line-width 190 --indent-width 2 "$@"
         '';
 
-        # The place is an argument rather than a path in the sources, so one
-        # checkout draws any number of doors. Typst resolves it against --root.
-        build = pkgs.writeShellScriptBin "build" ''
-          set -eu
-          place="''${1:?usage: build <tmp/place.typ> [out.pdf]}"
-          test -f "$place" || { echo "no such place: $place" >&2; exit 1; }
-          # the devShell pins it, and utils.typ refuses to date a document 1980
-          unset SOURCE_DATE_EPOCH
-          exec ${pkgs.typst}/bin/typst compile --root . --input place="/''${place#/}" \
-            typ/to_print.typ "''${2:-''${place%.typ}.pdf}"
-        '';
-        exampleplace = "/examples/aquafix_-_Clermont-Ferrand_-_North.typ";
-      in
-      {
-        apps.help = {
-          type = "app";
-          program = "${pkgs.writeShellScriptBin "help" ''
-            cat <<EOF
-            nix run . -- tmp/<place>.typ        Every sheet for that door, in tray order
-            nix build .#typ                     Each document on its own, off the example place
-            nix develop                         Enter the Typst development shell
-            EOF
-          ''}/bin/help";
-        };
-
-        apps.default = {
-          type = "app";
-          program = "${build}/bin/build";
-        };
-
-        packages.build = build;
-
         # A .typ nothing else imports is a document, and compiles to the same path
         # under $out; the rest are libraries, and typst would render them as a
         # blank page rather than say so. The letters under signs/ are cut to a
         # measured size, so the fonts are pinned rather than the builder's —
         # --ignore-system-fonts makes a missing one an error.
-        packages.typ = pkgs.stdenvNoCC.mkDerivation {
-          name = "${pname}-typ";
+        sheets = place: pkgs.stdenvNoCC.mkDerivation {
+          name = "${pname}-${pkgs.lib.removeSuffix ".typ" (baseNameOf place)}";
           src = ./.;
 
           nativeBuildInputs = [ pkgs.typst ];
@@ -95,7 +63,7 @@
             for f in $(find typ -name '*.typ'); do
               if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
               mkdir -p "$out/$(dirname "$f")"
-              typst compile --root . --ignore-system-fonts --input place=${exampleplace} \
+              typst compile --root . --ignore-system-fonts --input place=${place} \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
                 "$f" "$out/''${f%.typ}.pdf"
             done
@@ -104,7 +72,35 @@
           dontInstall = true;
         };
 
-        packages.default = self.packages.${system}.typ;
+        # `nix build` takes no argument, so each place file is a package of its own,
+        # named after the file. A door sits in tmp/, which git does not track and so
+        # `.#` cannot see — `path:.#<place>` copies the working tree instead, and
+        # reads the same for a tracked place.
+        placesIn =
+          name:
+          let
+            dir = ./. + "/${name}";
+          in
+          pkgs.lib.mapAttrs' (f: _: pkgs.lib.nameValuePair (pkgs.lib.removeSuffix ".typ" f) (sheets "/${name}/${f}")) (
+            pkgs.lib.optionalAttrs (builtins.pathExists dir) (
+              pkgs.lib.filterAttrs (f: t: t == "regular" && pkgs.lib.hasSuffix ".typ" f) (builtins.readDir dir)
+            )
+          );
+        places = placesIn "examples" // placesIn "tmp";
+      in
+      {
+        apps.help = {
+          type = "app";
+          program = "${pkgs.writeShellScriptBin "help" ''
+            cat <<EOF
+            nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
+            nix flake show path:.         Which doors there are to build
+            nix develop                   Enter the Typst development shell
+            EOF
+          ''}/bin/help";
+        };
+
+        packages = places;
 
         devShells.default = pkgs.mkShell {
           shellHook =
@@ -115,7 +111,7 @@
               cp -f ${(v_flakes.files.gitignore { inherit pkgs; langs = [ ]; extra = "*.pdf"; })} ./.gitignore
             '';
 
-          packages = [ pkgs.treefmt typstyleFmt pkgs.python3 build ]
+          packages = [ pkgs.treefmt typstyleFmt pkgs.python3 ]
             ++ pre-commit-check.enabledPackages
             ++ typ.enabledPackages
             ++ readme.enabledPackages;

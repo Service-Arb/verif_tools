@@ -1,9 +1,12 @@
-Write a place file. Then build the sheets for it:
+Write a place file into `tmp/`. Then build the sheets for it:
 
 ```sh
-nix run . -- examples/aquafix_-_Clermont-Ferrand_-_North.typ
+nix build "path:.#<place>"
 ```
 
-This makes one PDF next to the place file. Print it, and cut out the parts.
+The package name is the file name without `.typ`. Use `path:`, because git does
+not track `tmp/`. A plain `.` shows nix only the tracked files.
+
+This makes `result/typ/to_print.pdf`. Print it, and cut out the parts.
 
 In Claude Code, `/prepare-verif` writes the place file from an address.

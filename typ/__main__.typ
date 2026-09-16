@@ -1,10 +1,10 @@
 // What every document and plate under typ/ is drawn from. The place itself comes
 // in on the command line, so nothing here names a file:
-//   typst compile --root . --input place=/examples/<place>.typ typ/to_print.typ out.pdf
+//   typst compile --root . --input place=/tmp/<place>.typ typ/to_print.typ out.pdf
 #import "utils.typ": langs
 
 #let _place = sys.inputs.at("place", default: none)
-#assert(_place != none, message: "no place; compile with --input place=/examples/<place>.typ")
+#assert(_place != none, message: "no place; compile with --input place=/tmp/<place>.typ")
 #import _place: address, lang, nearby, proprietaire
 
 #assert(lang in langs, message: repr(lang) + " is not one of " + repr(langs))
