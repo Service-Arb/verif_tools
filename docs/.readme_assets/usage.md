@@ -1,11 +1,12 @@
-Some signs are the same for all addresses. Build them with no place file:
+Some sheets are the same for all addresses. Build them with no place file:
 
 ```sh
 nix build .#typ
 ```
 
-This makes `result/typ/reusable/__main__.pdf`. It has each sign in each language,
-one to a page. Print the pages you want.
+This makes one PDF for each: the signs in `result/typ/reusable/`, the letters to
+cut out and the plate colour in `result/typ/signs/`. Each sign PDF has one page
+for each language. Print the page you want.
 
 For one address, write a place file into `tmp/`. Then build the sheets for it:
 

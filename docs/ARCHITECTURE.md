@@ -13,13 +13,17 @@ Which splits the sources in two, and a build is the query that picks a half:
 | | `nix build .#typ` | `nix build "path:.#<place>"` |
 | --- | --- | --- |
 | asks for | the stock, before there is a door | one door's `to_print.pdf` |
-| gets | `typ/reusable/`, every language | every other sheet, specialized |
-| reaches `typ/__main__.typ` | never — it is handed no place | through it, for all of them |
+| gets | the cut-out alphabet, the plate blue, `reusable/` | every sheet, specialized |
+| how it picks | the documents whose imports never reach `typ/__main__.typ` | all of them |
 
-A sheet no door configures belongs under `typ/reusable/`, and stays printed until
-it runs out. Anything it draws with has to be place-free too, so the drawing sits
-apart from the sheet that specializes it — `signs/doorplate.typ` is the plate and
-the board, `signs/plaques.typ` is this address tiled across them.
+Which half a document falls in is read off its imports rather than its path, so a
+sheet joins the stock by not asking for an address. `typ/reusable/` is where the
+ones that could never ask live — signs a business hangs whoever it is, drawn in
+every language it knows and printed one page at a time.
+
+Anything the stock draws with has to be place-free too, so a drawing sits apart
+from the sheet that specializes it: `signs/doorplate.typ` is the plate and the
+board, `signs/plaques.typ` is this address tiled across them.
 
 ```mermaid
 flowchart LR

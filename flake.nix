@@ -38,23 +38,33 @@
         # measured size, so the fonts are pinned rather than the builder's —
         # --ignore-system-fonts makes a missing one an error.
         #
-        # `root` is how far down the sources the documents are looked for, and a
-        # build handed no `place` can only reach the ones that ask for none.
-        sheets = { name, root, place ? null }: pkgs.stdenvNoCC.mkDerivation {
+        # A document reaching `typ/__main__.typ` through its imports is the half of
+        # the sources a place decides; handed no place, a build draws the other half.
+        sheets = { name, place ? null }: pkgs.stdenvNoCC.mkDerivation {
           inherit name;
           src = ./.;
 
           nativeBuildInputs = [ pkgs.typst ];
 
           buildPhase = ''
-            : > imported
+            : > edges
             for f in $(find typ -name '*.typ'); do
               for imp in $(grep -oE '"[^"]*\.typ"' "$f" | tr -d '"' || true); do
                 case "$imp" in
-                  /*) realpath -m ".$imp" >> imported ;;
-                  *) realpath -m "$(dirname "$f")/$imp" >> imported ;;
+                  /*) echo "$(realpath -m "$f") $(realpath -m ".$imp")" >> edges ;;
+                  *) echo "$(realpath -m "$f") $(realpath -m "$(dirname "$f")/$imp")" >> edges ;;
                 esac
               done
+            done
+            cut -d' ' -f2 edges | sort -u > imported
+
+            # whatever imports something placed is itself placed, until it settles
+            realpath -m typ/__main__.typ > placed
+            while :; do
+              was=$(wc -l < placed)
+              awk 'NR==FNR { m[$0]; next } $2 in m { print $1 }' placed edges | cat - placed | sort -u > wider
+              mv wider placed
+              test "$(wc -l < placed)" = "$was" && break
             done
 
             # the documents date themselves off the clock, and the sandbox pins
@@ -63,8 +73,9 @@
             # was first built on; `__impure = true` if it has to follow the day
             unset SOURCE_DATE_EPOCH
 
-            for f in $(find ${root} -name '*.typ'); do
+            for f in $(find typ -name '*.typ'); do
               if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
+              ${pkgs.lib.optionalString (place == null) ''if grep -qxF "$(realpath -m "$f")" placed; then continue; fi''}
               mkdir -p "$out/$(dirname "$f")"
               typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
@@ -89,7 +100,6 @@
               f: _:
               pkgs.lib.nameValuePair (pkgs.lib.removeSuffix ".typ" f) (sheets {
                 name = "${pname}-${pkgs.lib.removeSuffix ".typ" f}";
-                root = "typ";
                 place = "/${name}/${f}";
               })
             )
@@ -101,10 +111,7 @@
         places = placesIn "examples" // placesIn "tmp";
 
         # The stock a door draws from before it is a particular door.
-        typ-reusable = sheets {
-          name = "${pname}-typ";
-          root = "typ/reusable";
-        };
+        typ-unplaced = sheets { name = "${pname}-typ"; };
 
         # `nix build` leaves a symlink in the working directory, and where the pack
         # wants to be is the folder the print dialog opens in. Same derivation,
@@ -164,8 +171,8 @@
         };
 
         packages = places // {
-          typ = typ-reusable;
-          default = typ-reusable;
+          typ = typ-unplaced;
+          default = typ-unplaced;
         };
 
         devShells.default = pkgs.mkShell {
