@@ -18,8 +18,9 @@ Which splits the sources in two, and a build is the query that picks a half:
 
 Which half a document falls in is read off its imports rather than its path, so a
 sheet joins the stock by not asking for an address. `typ/reusable/` is where the
-ones that could never ask live — signs a business hangs whoever it is, drawn in
-every language it knows and printed one page at a time.
+ones that could never ask live — signs a business hangs whoever it is. A sheet is
+what goes on a wall, so a language is a file of its own rather than a page to
+leaf past: `<sign>.<lang>.typ`.
 
 Anything the stock draws with has to be place-free too, so a drawing sits apart
 from the sheet that specializes it: `signs/doorplate.typ` is the plate and the

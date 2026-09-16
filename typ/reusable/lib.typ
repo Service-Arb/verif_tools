@@ -15,23 +15,6 @@
   lang,
 )
 
-// 200x80 is what the sign shops sell the adhesive one at, so it prints at the
-// size it is and the border is the line to cut along.
-#let _plate-w = 200mm
-#let _plate-h = 80mm
-
-#let plate(lang) = {
-  set page(paper: "a4", margin: 20mm, fill: white)
-  set text(font: "Liberation Sans", fill: _ink)
-  align(center + horizon, box(
-    width: _plate-w,
-    height: _plate-h,
-    stroke: 1pt + _ink,
-    inset: 10mm,
-    align(center + horizon, fit(160mm, 34pt, sz => text(size: sz, weight: "bold", tracking: sz * 0.04, upper(_words(lang).main)))),
-  ))
-}
-
 // The general prohibition sign is a red ring and a bar across it, and carries
 // whatever the words underneath say it forbids.
 #let _disc(size) = box(width: size, height: size, {

@@ -5,8 +5,8 @@ nix build .#typ
 ```
 
 This makes one PDF for each: the signs in `result/typ/reusable/`, the letters to
-cut out and the plate colour in `result/typ/signs/`. Each sign PDF has one page
-for each language. Print the page you want.
+cut out and the plate colour in `result/typ/signs/`. A sign has one PDF for each
+language. Print the one you want.
 
 For one address, write a place file into `tmp/`. Then build the sheets for it:
 
