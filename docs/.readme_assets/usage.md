@@ -1,4 +1,13 @@
-Write a place file into `tmp/`. Then build the sheets for it:
+Some signs are the same for all addresses. Build them with no place file:
+
+```sh
+nix build .#typ
+```
+
+This makes `result/typ/reusable/__main__.pdf`. It has each sign in each language,
+one to a page. Print the pages you want.
+
+For one address, write a place file into `tmp/`. Then build the sheets for it:
 
 ```sh
 nix build "path:.#<place>"

@@ -1,5 +1,7 @@
-// typst compile --root . --input place=/tmp/<place>.typ typ/reusable/__main__.typ out.pdf
-#import "../__main__.typ": lang
+// typst compile --root . typ/reusable/__main__.typ out.pdf
+// No place, so no language either: every sign in every language it knows, and
+// the page you want is the one you print.
+#import "../utils.typ": langs
 #import "lib.typ": board, notice
 
-#(board(lang), notice(lang)).join(pagebreak(weak: true))
+#langs.map(lang => (board(lang), notice(lang))).flatten().join(pagebreak(weak: true))

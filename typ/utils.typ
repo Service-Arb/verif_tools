@@ -64,6 +64,13 @@
   out.join(" ")
 }
 
+// Glyph outlines scale linearly with size, so probing once lands the size that
+// fills the width. Capped, or a short line comes out a slab.
+#let fit(width, cap, draw) = context {
+  let probe = 100pt
+  draw(calc.min(cap, probe * (width / measure(draw(probe)).width)))
+}
+
 // Doubles as Typst's own `text(lang:)` codes.
 #let langs = ("fr", "en")
 

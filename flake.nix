@@ -37,8 +37,11 @@
         # blank page rather than say so. The letters under signs/ are cut to a
         # measured size, so the fonts are pinned rather than the builder's —
         # --ignore-system-fonts makes a missing one an error.
-        sheets = place: pkgs.stdenvNoCC.mkDerivation {
-          name = "${pname}-${pkgs.lib.removeSuffix ".typ" (baseNameOf place)}";
+        #
+        # `root` is how far down the sources the documents are looked for, and a
+        # build handed no `place` can only reach the ones that ask for none.
+        sheets = { name, root, place ? null }: pkgs.stdenvNoCC.mkDerivation {
+          inherit name;
           src = ./.;
 
           nativeBuildInputs = [ pkgs.typst ];
@@ -60,10 +63,10 @@
             # was first built on; `__impure = true` if it has to follow the day
             unset SOURCE_DATE_EPOCH
 
-            for f in $(find typ -name '*.typ'); do
+            for f in $(find ${root} -name '*.typ'); do
               if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
               mkdir -p "$out/$(dirname "$f")"
-              typst compile --root . --ignore-system-fonts --input place=${place} \
+              typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
                 "$f" "$out/''${f%.typ}.pdf"
             done
@@ -81,12 +84,27 @@
           let
             dir = ./. + "/${name}";
           in
-          pkgs.lib.mapAttrs' (f: _: pkgs.lib.nameValuePair (pkgs.lib.removeSuffix ".typ" f) (sheets "/${name}/${f}")) (
-            pkgs.lib.optionalAttrs (builtins.pathExists dir) (
-              pkgs.lib.filterAttrs (f: t: t == "regular" && pkgs.lib.hasSuffix ".typ" f) (builtins.readDir dir)
+          pkgs.lib.mapAttrs'
+            (
+              f: _:
+              pkgs.lib.nameValuePair (pkgs.lib.removeSuffix ".typ" f) (sheets {
+                name = "${pname}-${pkgs.lib.removeSuffix ".typ" f}";
+                root = "typ";
+                place = "/${name}/${f}";
+              })
             )
-          );
+            (
+              pkgs.lib.optionalAttrs (builtins.pathExists dir) (
+                pkgs.lib.filterAttrs (f: t: t == "regular" && pkgs.lib.hasSuffix ".typ" f) (builtins.readDir dir)
+              )
+            );
         places = placesIn "examples" // placesIn "tmp";
+
+        # The stock a door draws from before it is a particular door.
+        typ-reusable = sheets {
+          name = "${pname}-typ";
+          root = "typ/reusable";
+        };
 
         # `nix build` leaves a symlink in the working directory, and where the pack
         # wants to be is the folder the print dialog opens in. Same derivation,
@@ -131,6 +149,7 @@
           type = "app";
           program = "${pkgs.writeShellScriptBin "help" ''
             cat <<EOF
+            nix build .#typ              The signs no door decides, in every language
             nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
             nix run . -- <place.typ>      The same to_print.pdf, in your downloads or -o DIR
             nix flake show path:.         Which doors there are to build
@@ -144,7 +163,10 @@
           program = "${pack}/bin/pack";
         };
 
-        packages = places;
+        packages = places // {
+          typ = typ-reusable;
+          default = typ-reusable;
+        };
 
         devShells.default = pkgs.mkShell {
           shellHook =

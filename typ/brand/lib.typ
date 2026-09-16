@@ -2,10 +2,10 @@
 // and the card. The place file names the business; the mark and the colours are
 // the same whoever it is, so a new door redraws nothing.
 #import "../__main__.typ": address, brand, lang
-#import "../utils.typ": tr
+#import "../utils.typ": fit, tr
 // the reach of a desktop printer and the lane to cut in are the same here as for
 // the plates, and they are the printer's, not the plate's
-#import "../signs/plaques.typ": lane, margin
+#import "../signs/doorplate.typ": lane, margin
 
 #let ink = rgb("#051726")
 #let ink-soft = rgb("#5a6b7c")
@@ -42,13 +42,6 @@
   align: horizon,
   mark(size * 1.25, copper), text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name)),
 )
-
-// Glyph outlines scale linearly with size, so probing once lands the size that
-// fills the width. Capped, or a short name comes out a slab.
-#let fit(width, cap, draw) = context {
-  let probe = 100pt
-  draw(calc.min(cap, probe * (width / measure(draw(probe)).width)))
-}
 
 #let front = box(width: card-w, height: card-h, fill: navy, {
   set text(font: "Liberation Sans")
