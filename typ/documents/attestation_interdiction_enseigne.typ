@@ -1,23 +1,13 @@
-#import "../__main__.typ": address
-#import "../utils.typ": digit-code, format-date, tr
+#import "../__main__.typ": address, proprietaire
+#import "../utils.typ": format-date, tr
+#import "bailleur.typ": coordonnees, letterhead, signataire, signature, ville
 
-#let adresse_bailleur = "12 rue des Carmes, 63000 Clermont-Ferrand, France"
-#let ville = "Clermont-Ferrand"
 #let adresse_local = address.street + ", " + address.city
-#let forme_juridique = "Société civile immobilière"
-#let telephone = "04 73 00 00 00"
-#let email = "contact@lesvolcans-immo.fr"
-#let siren = digit-code((3, 3, 3))
-#let signataire = "Jean Dupont"
 
-#let attestation(lang: "fr", proprietaire: none, date: none) = {
+#let attestation(lang: "fr", date: none) = {
   let s = tr(
     (
       fr: (
-        qualite: "Gérant",
-        contact: "CONTACT",
-        tel: "Tél. : " + telephone,
-        colon: " : ",
         titre: "ATTESTATION",
         sous_titre: "Interdiction d’enseigne permanente sur la façade",
         date: "Date :",
@@ -36,13 +26,8 @@
         ],
         fait: [Fait à #ville, le #format-date(date, lang).],
         signature: "Signature :",
-        panneau: "Coordonnées du bailleur / gestionnaire",
       ),
       en: (
-        qualite: "Manager",
-        contact: "CONTACT",
-        tel: "Phone: " + telephone,
-        colon: ": ",
         titre: "CERTIFICATE",
         sous_titre: "Permanent façade signage not permitted",
         date: "Date:",
@@ -61,7 +46,6 @@
         ],
         fait: [Done at #ville, on #format-date(date, lang).],
         signature: "Signature:",
-        panneau: "Landlord / manager contact details",
       ),
     ),
     lang,
@@ -75,29 +59,7 @@
   set text(font: "New Computer Modern", size: 10pt, lang: lang)
   set par(justify: true, leading: 0.58em)
 
-  let rule = rgb("B8BDC5")
-  let panel = rgb("F4F5F7")
-
-  grid(
-    columns: (1fr, auto),
-    gutter: 12pt,
-    align: (left, top),
-    [
-      #text(size: 16pt, weight: "bold")[#proprietaire] \
-      #text(size: 9pt)[#forme_juridique] \
-      #text(size: 9pt)[#adresse_bailleur] \
-    ],
-    [
-      #align(right)[
-        #text(size: 8pt, weight: "bold", tracking: 0.8pt)[#s.contact] \
-        #text(size: 9pt)[#s.tel] \
-        #text(size: 9pt)[Email#s.colon#email] \
-        #text(size: 9pt)[SIREN#s.colon#siren]
-      ]
-    ],
-  )
-  v(6mm)
-  line(length: 100%, stroke: 0.6pt + rule)
+  letterhead(lang)
   v(7mm)
 
   align(center)[
@@ -136,27 +98,6 @@
     columns: (1fr, 0.92fr),
     gutter: 16pt,
     align: (left, top),
-    [
-      #text(weight: "bold")[#s.signature] \
-      #v(1mm)
-      #image("signature.png", width: 42mm) \
-      #v(2mm)
-      #text(weight: "bold")[#signataire] \
-      #text()[#s.qualite] \
-      #text()[#proprietaire]
-    ],
-    [
-      #box(fill: panel, inset: 6pt, width: 100%)[
-        #text(size: 9pt)[
-          #strong[#s.panneau] \
-          #v(2pt)
-          #proprietaire \
-          #adresse_bailleur \
-          #s.tel \
-          Email#s.colon#email \
-          SIREN#s.colon#siren
-        ]
-      ]
-    ],
+    signature(lang, s.signature), coordonnees(lang),
   )
 }

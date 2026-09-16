@@ -58,3 +58,15 @@ business board per page, the cards to cut out, and the door sheets.
 
 `nix build "path:.#<place>"` draws every sheet on its own under `result/typ/` —
 a symlink into the store, not something to hand over.
+
+## 5. Then read back what the door needs that the pack does not carry
+
+`typ/reusable/` is signs no place decides: the same ones hang on every door, so
+they are printed once rather than per pack, and `to_print.pdf` leaves them out.
+
+Read `typ/reusable/lib.typ` and list what it draws — one line each, in the user's
+`lang` — and ask them to confirm each is already on the door. Whatever is not:
+
+```sh
+nix build "path:.#<place>" && cp result/typ/reusable/__main__.pdf .   # one version per page
+```
