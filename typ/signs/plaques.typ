@@ -49,7 +49,7 @@
         #context {
           let probe = 100pt
           let lines = name.split("\n")
-          let scaled = lines.enumerate().map(((i, l)) => measure(engraved(l, probe)).width / (if i == 0 { 1.0 } else { sub }))
+          let scaled = lines.enumerate().map(((i, l)) => measure(engraved(l, probe)).width * (if i == 0 { 1.0 } else { sub }))
           let size = calc.min(30pt, probe * ((width - 26.8mm) / calc.max(..scaled)))
           set align(center + horizon)
           set par(leading: 0.4em)
