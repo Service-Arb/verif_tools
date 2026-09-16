@@ -6,6 +6,7 @@
 #let lane = 4mm
 // two across the reachable width of A4, so both plate and plaque tile the same
 #let width = 90mm
+#let plaque-height = 62mm
 
 #set page(paper: "a4", margin: margin)
 #set par(justify: false, leading: lane, spacing: lane)
@@ -39,7 +40,7 @@
 // the line after the break carries the suffix, and sits at
 #let sub = 0.62
 
-#let plaque(name) = box(width: width, height: 62mm, fill: wood, stroke: 0.4pt + rgb("#2d1a0b"))[
+#let plaque(name) = box(width: width, height: plaque-height, fill: wood, stroke: 0.4pt + rgb("#2d1a0b"))[
   #place(top + left, dx: 3.2mm, dy: 3.2mm, screw)
   #place(top + right, dx: -3.2mm, dy: 3.2mm, screw)
   #place(bottom + left, dx: 3.2mm, dy: -3.2mm, screw)
@@ -69,4 +70,18 @@
 
 #parbreak()
 
-#nearby.competitors.map(plaque).join(h(lane, weak: true))
+// A competitor's board is the thing in the shot, so it gets a page to itself and
+// prints as large as the paper allows — 90:62 is within a hair of landscape A4
+// inside the margins, so scaling the drawn plaque up leaves almost nothing over.
+#for name in nearby.competitors {
+  page(
+    paper: "a4",
+    flipped: true,
+    layout(room => scale(
+      calc.min(room.width / width, room.height / plaque-height) * 100%,
+      origin: top + left,
+      reflow: true,
+      plaque(name),
+    )),
+  )
+}
