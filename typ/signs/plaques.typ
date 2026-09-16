@@ -1,5 +1,4 @@
-// typst compile --root typ typ/print/signs/nearby.typ out.pdf
-#import "../../config.typ": address, nearby
+#import "../config.typ": address, nearby
 
 // what a desktop printer refuses to reach, plus a lane to cut in
 #let margin = 10mm
@@ -7,9 +6,6 @@
 // two across the reachable width of A4, so both plate and plaque tile the same
 #let width = 90mm
 #let plaque-height = 62mm
-
-#set page(paper: "a4", margin: margin)
-#set par(justify: false, leading: lane, spacing: lane)
 
 #let plate = box(
   width: width,
@@ -64,24 +60,27 @@
   ]
 ]
 
-// Inline boxes wrap at the right margin and break across pages on their own; the
-// lane between them is weak, so it collapses rather than pushing a row over.
-#range(nearby.print_my_address_n).map(_ => plate).join(h(lane, weak: true))
+#let boards = {
+  set page(paper: "a4", margin: margin)
+  set par(justify: false, leading: lane, spacing: lane)
 
-#parbreak()
+  // Inline boxes wrap at the right margin and break across pages on their own; the
+  // lane between them is weak, so it collapses rather than pushing a row over.
+  range(nearby.print_my_address_n).map(_ => plate).join(h(lane, weak: true))
 
-// A competitor's board is the thing in the shot, so it gets a page to itself and
-// prints as large as the paper allows — 90:62 is within a hair of landscape A4
-// inside the margins, so scaling the drawn plaque up leaves almost nothing over.
-#for name in nearby.competitors {
-  page(
-    paper: "a4",
-    flipped: true,
-    layout(room => scale(
-      calc.min(room.width / width, room.height / plaque-height) * 100%,
-      origin: top + left,
-      reflow: true,
-      plaque(name),
-    )),
-  )
+  // A competitor's board is the thing in the shot, so it gets a page to itself and
+  // prints as large as the paper allows — 90:62 is within a hair of landscape A4
+  // inside the margins, so scaling the drawn plaque up leaves almost nothing over.
+  for name in nearby.competitors {
+    page(
+      paper: "a4",
+      flipped: true,
+      layout(room => scale(
+        calc.min(room.width / width, room.height / plaque-height) * 100%,
+        origin: top + left,
+        reflow: true,
+        plaque(name),
+      )),
+    )
+  }
 }

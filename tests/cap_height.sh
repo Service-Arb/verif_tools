@@ -15,7 +15,7 @@ trap 'rm -rf "$out"' EXIT
 
 typst compile --ignore-system-fonts \
   --font-path "$(nix build nixpkgs#liberation_ttf --no-link --print-out-paths)/share/fonts/truetype" \
-  --format png --ppi "$ppi" typ/print/signs/alphabet.typ "$out/p{p}.png"
+  --format png --ppi "$ppi" typ/signs/alphabet.typ "$out/p{p}.png"
 
 python3 - "$out" "$cap_mm" "$margin_mm" "$ppi" "$tol_mm" <<'PY'
 import glob, subprocess, sys

@@ -1,9 +1,10 @@
 # signs
 
-A Lyon street plate, printed on whatever A4 is in the office and cut out.
+What hangs on a wall, printed on whatever A4 is in the office and cut out: a Lyon
+street plate, and the plaques of `config.typ`'s `nearby`.
 
 ```sh
-nix build .#typ            # result/print/signs/{background,alphabet,street}.pdf
+nix build .#typ            # result/signs/{background,alphabet,street,nearby}.pdf
 ./tests/cap_height.sh      # the caps come off the paper at the size they claim
 ```
 
@@ -25,3 +26,8 @@ tops and baselines — 6.3cm. `--input cap=6.5cm` if you get to hold a ruler to 
 
 Letters are adjacent with no gap, so the rows are packed by measurement in
 `cutout.typ`: Typst breaks lines at spaces, and there are none.
+
+`nearby.pdf` draws `plaques.typ`: the address plate at the size one is screwed to
+a door, tiled `print_my_address_n` times, then a competitor's board at the size it
+fills a landscape sheet, one per page. A `\n` in a competitor's name is where its
+board breaks the line, and the tail sets smaller — where the trade suffix sits.

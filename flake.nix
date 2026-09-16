@@ -65,7 +65,7 @@
 
         # A .typ nothing else imports is a document, and compiles to the same path
         # under $out; the rest are libraries, and typst would render them as a
-        # blank page rather than say so. The letters in print/ are cut to a
+        # blank page rather than say so. The letters under signs/ are cut to a
         # measured size, so the fonts are pinned rather than the builder's —
         # --ignore-system-fonts makes a missing one an error.
         packages.typ = pkgs.stdenvNoCC.mkDerivation {
