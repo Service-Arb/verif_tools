@@ -1,6 +1,6 @@
 ---
 name: prepare-verif
-description: Turn an address into a printable verification pack — write examples/<place>.typ, filling neighbour and competitor plaques from OpenStreetMap, then build it. Use on /prepare-verif, or when asked to prepare/generate the verification sheets, signs or attestation for a business address.
+description: Turn an address into a printable verification pack — write tmp/<place>.typ, filling neighbour and competitor plaques from OpenStreetMap, then build it. Use on /prepare-verif, or when asked to prepare/generate the verification sheets, signs or attestation for a business address.
 ---
 
 # prepare-verif
@@ -45,12 +45,16 @@ put the trade suffix there (`"CLO\nCoffee Co."`).
 Always build — the pack, not the place file, is what the user asked for.
 
 ```sh
-nix build "path:.#<place>"     # <place> is the file name without .typ
+nix run . -- tmp/<place>.typ          # to_print.pdf, in the user's downloads
+nix run . -- tmp/<place>.typ -o DIR   # -o names a directory, the file is always to_print.pdf
+nix build "path:.#<place>"            # every sheet on its own, under result/typ/
 ```
 
-`path:` and not `.`, or nix builds from the git tree, which does not have `tmp/`
-in it. Every sheet lands in `result/typ/`, in tray order in `to_print.pdf`.
+Prefer `nix run`: it prints the path it wrote, and that path is a file the user
+can open, not a symlink into the store. It writes one `to_print.pdf`, so a second
+door overwrites the first unless you give `-o`. `path:` and not `.` on the build,
+or nix reads the git tree, which does not have `tmp/` in it.
 
-Show the user that path and what is on it: the street letters to cut out, the
+Show the user the path it printed and what is on it: the street letters to cut out, the
 attestation, our address plate tiled, the neighbour's plate, one competitor board
 per page.

@@ -9,4 +9,10 @@ not track `tmp/`. A plain `.` shows nix only the tracked files.
 
 This makes `result/typ/to_print.pdf`. Print it, and cut out the parts.
 
+To get that file in your download directory, use this:
+
+```sh
+nix run . -- tmp/<place>.typ          # -o DIR puts it in DIR instead
+```
+
 In Claude Code, `/prepare-verif` writes the place file from an address.

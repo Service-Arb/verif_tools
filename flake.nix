@@ -87,6 +87,44 @@
             )
           );
         places = placesIn "examples" // placesIn "tmp";
+
+        # `nix build` leaves a symlink in the working directory, and where the pack
+        # wants to be is the folder the print dialog opens in. Same derivation,
+        # copied out of the store — one file, so -o takes the directory to put it.
+        pack = pkgs.writeShellScriptBin "pack" ''
+          set -eu
+          place=""
+          out=""
+          while [ $# -gt 0 ]; do
+            case "$1" in
+              -o) out="''${2:?-o wants a directory}"; shift 2 ;;
+              -*) echo "unknown flag: $1" >&2; exit 2 ;;
+              *) place="$1"; shift ;;
+            esac
+          done
+          test -n "$place" || { echo "usage: nix run . -- <tmp/place.typ> [-o DIR]" >&2; exit 2; }
+          test -f "$place" || { echo "no such place: $place" >&2; exit 1; }
+          case "$(dirname "$place")" in
+            tmp | ./tmp | examples | ./examples) ;;
+            *) echo "a place is a package, and nix reads them out of tmp/ and examples/: $place is in neither" >&2; exit 1 ;;
+          esac
+
+          if [ -z "$out" ]; then
+            out=$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir DOWNLOAD)
+            # what it answers when no user-dirs.dirs names one
+            if [ "$out" = "$HOME" ]; then out="$HOME/Downloads"; fi
+          fi
+          if [ ! -d "$out" ]; then
+            echo "nowhere to put the pack: $out is not a directory" >&2
+            echo "nothing on this machine says where downloads go, so name one:" >&2
+            echo "  nix run . -- $place -o <dir>" >&2
+            exit 1
+          fi
+
+          built=$(nix build --no-link --print-out-paths "path:.#$(basename "$place" .typ)")
+          install -m 644 "$built/typ/to_print.pdf" "$out/to_print.pdf"
+          echo "$out/to_print.pdf"
+        '';
       in
       {
         apps.help = {
@@ -94,10 +132,16 @@
           program = "${pkgs.writeShellScriptBin "help" ''
             cat <<EOF
             nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
+            nix run . -- <place.typ>      The same to_print.pdf, in your downloads or -o DIR
             nix flake show path:.         Which doors there are to build
             nix develop                   Enter the Typst development shell
             EOF
           ''}/bin/help";
+        };
+
+        apps.default = {
+          type = "app";
+          program = "${pack}/bin/pack";
         };
 
         packages = places;
