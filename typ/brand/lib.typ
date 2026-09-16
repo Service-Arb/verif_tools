@@ -3,9 +3,9 @@
 // the same whoever it is, so a new door redraws nothing.
 #import "../__main__.typ": address, brand, lang
 #import "../utils.typ": fit, tr
-// the reach of a desktop printer and the lane to cut in are the same here as for
-// the plates, and they are the printer's, not the plate's
-#import "../signs/doorplate.typ": lane, margin
+// the reach of a desktop printer is the same here as for the plates, and it is
+// the printer's, not the plate's
+#import "../signs/doorplate.typ": margin
 
 #let ink = rgb("#051726")
 #let ink-soft = rgb("#5a6b7c")
@@ -81,15 +81,10 @@
 
 // Both faces of `n` cards. A row is one card, so what comes off the guillotine is
 // a front and the back that belongs to it; the grid pages itself once a column of
-// them runs off the paper.
+// them runs off the paper. Cards share their edges, so a cut frees two at once.
 #let cards(n, c: contact) = {
   set page(paper: "a4", margin: margin, fill: white)
-  grid(
-    columns: (card-w, card-w),
-    column-gutter: lane,
-    row-gutter: lane,
-    ..range(n).map(_ => (front, back(c))).flatten()
-  )
+  grid(columns: (card-w, card-w), ..range(n).map(_ => (front, back(c))).flatten())
 }
 
 // A4 on whatever is in the office. Each line is set to the distance it is read

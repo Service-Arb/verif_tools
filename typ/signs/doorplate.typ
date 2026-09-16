@@ -1,9 +1,8 @@
 // What is screwed up beside a door, drawn at the size one is. Whose door it is
 // decides nothing here, so `reusable/` hangs the same two on any of them.
 
-// what a desktop printer refuses to reach, plus a lane to cut in
+// what a desktop printer refuses to reach
 #let margin = 10mm
-#let lane = 4mm
 // two across the reachable width of A4, so both plate and plaque tile the same
 #let width = 90mm
 #let plaque-height = 62mm

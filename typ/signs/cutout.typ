@@ -3,9 +3,8 @@
 // Measured off a Lyon plaque ("AVENUE THIERS", 6eme arrt): the caps span 0.211 of
 // the plate's height, whatever blank the plate is cut from.
 #let cap = 0.211 * street_plate.height
-// what a desktop printer refuses to reach, plus a lane to cut in
+// what a desktop printer refuses to reach
 #let margin = 10mm
-#let lane = 4mm
 
 // What a letter sheet keeps of a name: the caps, unaccented, in reading order.
 #let dropped = "0123456789 -'.,"
@@ -27,7 +26,7 @@
   assert(glyphs.len() > 0, message: "nothing to cut out")
 
   set page(paper: "a4", margin: margin)
-  set par(leading: 0pt, spacing: lane)
+  set par(leading: 0pt, spacing: 0pt)
   set text(
     font: "Liberation Sans",
     weight: "bold",
