@@ -1,4 +1,4 @@
-#import "../config.typ": address
+#import "../__main__.typ": address
 #import "../utils.typ": digit-code, format-date, tr
 
 #let adresse_bailleur = "12 rue des Carmes, 63000 Clermont-Ferrand, France"

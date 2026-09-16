@@ -1,4 +1,4 @@
-#import "../config.typ": address, nearby
+#import "../__main__.typ": address, nearby
 
 // what a desktop printer refuses to reach, plus a lane to cut in
 #let margin = 10mm

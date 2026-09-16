@@ -1,5 +1,5 @@
-// What every document and plate under typ/ is drawn from.
-#import "utils.typ": langs
+// One place. `typ/__main__.typ` is handed this file and checks its shape.
+// Named `<business>_-_<city>_-_<branch>`, since one business gets one per door.
 
 #let lang = "fr"
 #let proprietaire = "SCI Les Volcans"
@@ -23,8 +23,5 @@
   neighbours: (
     (name: "Résidence des Cézeaux", street: "25 avenue des Landais"),
   ),
-  print_my_address_n: 6,
+  print_my_address_n: 3,
 )
-
-#assert(lang in langs, message: repr(lang) + " is not one of " + repr(langs))
-#assert(nearby.print_my_address_n > 0, message: "no copies of the address plate asked for")

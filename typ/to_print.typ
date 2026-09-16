@@ -1,7 +1,7 @@
-// typst compile --root typ typ/to_print.typ to_print.pdf
+// nix run . -- examples/<place>.typ
 // One pass through the printer, in tray order. Add to `sheets`; each entry opens
 // its own page, so nothing here has to know what sits above it.
-#import "config.typ": address, lang, proprietaire
+#import "__main__.typ": address, lang, proprietaire
 #import "utils.typ": recent-date
 #import "documents/attestation_interdiction_enseigne.typ": attestation
 #import "signs/cutout.typ": letters, sheet

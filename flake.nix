@@ -31,37 +31,38 @@
         typstyleFmt = pkgs.writeShellScriptBin "typstyle-fmt" ''
           exec ${pkgs.typstyle}/bin/typstyle --line-width 190 --indent-width 2 "$@"
         '';
+
+        # The place is an argument rather than a path in the sources, so one
+        # checkout draws any number of doors. Typst resolves it against --root.
+        build = pkgs.writeShellScriptBin "build" ''
+          set -eu
+          place="''${1:?usage: build <examples/place.typ> [out.pdf]}"
+          test -f "$place" || { echo "no such place: $place" >&2; exit 1; }
+          # the devShell pins it, and utils.typ refuses to date a document 1980
+          unset SOURCE_DATE_EPOCH
+          exec ${pkgs.typst}/bin/typst compile --root . --input place="/''${place#/}" \
+            typ/to_print.typ "''${2:-$(basename "''${place%.typ}").pdf}"
+        '';
+        exampleplace = "/examples/aquafix_-_Clermont-Ferrand_-_North.typ";
       in
       {
         apps.help = {
           type = "app";
           program = "${pkgs.writeShellScriptBin "help" ''
             cat <<EOF
-            nix build .#default   Build __main__.typ into output.pdf
-            nix develop           Enter the Typst development shell
-            typst watch __main__.typ output.pdf   Watch and rebuild the document
+            nix run . -- examples/<place>.typ   Every sheet for that door, in tray order
+            nix build .#typ                     Each document on its own, off the example place
+            nix develop                         Enter the Typst development shell
             EOF
           ''}/bin/help";
         };
 
         apps.default = {
           type = "app";
-          program = "${pkgs.writeShellScriptBin "build" ''
-            exec typst compile __main__.typ output.pdf
-          ''}/bin/build";
+          program = "${build}/bin/build";
         };
 
-        packages.help = pkgs.writeShellScriptBin "help" ''
-          cat <<EOF
-          nix build .#default   Build __main__.typ into output.pdf
-          nix develop           Enter the Typst development shell
-          typst watch __main__.typ output.pdf   Watch and rebuild the document
-          EOF
-        '';
-
-        packages.build = pkgs.writeShellScriptBin "build" ''
-          exec typst compile __main__.typ output.pdf
-        '';
+        packages.build = build;
 
         # A .typ nothing else imports is a document, and compiles to the same path
         # under $out; the rest are libraries, and typst would render them as a
@@ -70,13 +71,13 @@
         # --ignore-system-fonts makes a missing one an error.
         packages.typ = pkgs.stdenvNoCC.mkDerivation {
           name = "${pname}-typ";
-          src = ./typ;
+          src = ./.;
 
           nativeBuildInputs = [ pkgs.typst ];
 
           buildPhase = ''
             : > imported
-            for f in $(find . -name '*.typ'); do
+            for f in $(find typ -name '*.typ'); do
               for imp in $(grep -oE '"[^"]*\.typ"' "$f" | tr -d '"' || true); do
                 case "$imp" in
                   /*) realpath -m ".$imp" >> imported ;;
@@ -91,10 +92,10 @@
             # was first built on; `__impure = true` if it has to follow the day
             unset SOURCE_DATE_EPOCH
 
-            for f in $(find . -name '*.typ'); do
+            for f in $(find typ -name '*.typ'); do
               if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
               mkdir -p "$out/$(dirname "$f")"
-              typst compile --root . --ignore-system-fonts \
+              typst compile --root . --ignore-system-fonts --input place=${exampleplace} \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
                 "$f" "$out/''${f%.typ}.pdf"
             done
@@ -103,21 +104,7 @@
           dontInstall = true;
         };
 
-        packages.default = pkgs.stdenvNoCC.mkDerivation {
-          name = "${pname}-document";
-          src = ./.;
-
-          nativeBuildInputs = [ pkgs.typst ];
-
-          buildPhase = ''
-            typst compile __main__.typ output.pdf
-          '';
-
-          installPhase = ''
-            mkdir -p $out
-            cp output.pdf $out/
-          '';
-        };
+        packages.default = self.packages.${system}.typ;
 
         devShells.default = pkgs.mkShell {
           shellHook =
@@ -128,7 +115,7 @@
               cp -f ${(v_flakes.files.gitignore { inherit pkgs; langs = [ ]; extra = "*.pdf"; })} ./.gitignore
             '';
 
-          packages = [ pkgs.treefmt typstyleFmt ]
+          packages = [ pkgs.treefmt typstyleFmt pkgs.python3 build ]
             ++ pre-commit-check.enabledPackages
             ++ typ.enabledPackages
             ++ readme.enabledPackages;
