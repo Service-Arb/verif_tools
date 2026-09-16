@@ -12,6 +12,15 @@
   city: "63100 Clermont-Ferrand",
 )
 
+// The business as its own paper calls it. For "Aquafix Plombier Chauffagiste -
+// Lyon, Nord", `name` is "Aquafix" and `descriptor` is everything after it.
+#let brand = (
+  name: "Hexaclim",
+  descriptor: "Chauffagiste - Clermont-Ferrand Sud",
+  print_card_n: 1, // one card is two sides, so this many of each
+  print_sheet_n: 4,
+)
+
 #let nearby = (
   // The nearest doors that carry a name of their own, whatever they sell. One
   // plaque each. A "\n" is where that plaque breaks its line, and what follows is

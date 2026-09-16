@@ -1,8 +1,9 @@
 // nix build "path:.#<place>"
 // One pass through the printer, in tray order. Add to `sheets`; each entry opens
 // its own page, so nothing here has to know what sits above it.
-#import "__main__.typ": address, lang, proprietaire
+#import "__main__.typ": address, brand, lang, proprietaire
 #import "utils.typ": recent-date
+#import "brand/lib.typ": cards, poster
 #import "documents/attestation_interdiction_enseigne.typ": attestation
 #import "signs/cutout.typ": letters, sheet
 #import "signs/plaques.typ": boards
@@ -11,6 +12,8 @@
   sheet(letters(address.street)),
   attestation(lang: lang, proprietaire: proprietaire, date: recent-date()),
   boards,
+  cards(brand.print_card_n),
+  ..range(brand.print_sheet_n).map(_ => poster()),
 )
 
 #sheets.join(pagebreak(weak: true))

@@ -11,8 +11,10 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | --- | --- |
 | `address.street`, `address.city` | the postal line |
 | `proprietaire` | landlord on the attestation |
+| `brand.name`, `brand.descriptor` | the business, and the trade and territory line under it |
 
-`lang` is `"fr"` and `print_my_address_n` is `3` unless the user says otherwise.
+`lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2` and
+`brand.print_sheet_n` is `4` unless the user says otherwise.
 The rest of the letterhead — address, e-mail, SIREN, signatory — is fixed in
 `typ/documents/attestation_interdiction_enseigne.typ` to `SCI Les Volcans`, so
 `proprietaire` is that name unless the user gives their own landlord.
@@ -52,7 +54,7 @@ nix run . -- tmp/<place>.typ -o DIR    # DIR is a directory; the file is always 
 Without `-o` it lands in the user's downloads, where a second door overwrites the
 first. Hand over the path it printed, and say what is on it: the street letters to
 cut out, the attestation, our address plate tiled, the neighbour's plate, one
-business board per page.
+business board per page, the cards to cut out, and the door sheets.
 
 `nix build "path:.#<place>"` draws every sheet on its own under `result/typ/` —
 a symlink into the store, not something to hand over.
