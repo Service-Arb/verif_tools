@@ -9,7 +9,7 @@
 
   // Inline boxes wrap at the right margin and break across pages on their own; the
   // lane between them is weak, so it collapses rather than pushing a row over.
-  ((address,) + nearby.neighbours).map(a => range(nearby.print_my_address_n).map(_ => plate(a))).flatten().join(h(lane, weak: true))
+  (range(nearby.print_my_address_n).map(_ => plate(address)) + nearby.neighbours.map(plate)).join(h(lane, weak: true))
 
   nearby.other_businesses.map(name => alone(plaque(name))).join()
 }

@@ -33,7 +33,7 @@
     "Freeman Law Center,\nLLC",
     "CLO\nCoffee Co.",
   ),
-  // Plates for the doors next door, drawn like ours and tiled the same.
+  // Plates for the doors next door, drawn like ours, one each.
   neighbours: (
     (name: "Résidence des Cézeaux", street: "25 avenue des Landais"),
   ),

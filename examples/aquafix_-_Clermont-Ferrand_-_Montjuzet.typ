@@ -34,7 +34,7 @@
     "Cordonnerie", // 106m
     "Auchan\nSupermarché", // 113m
   ),
-  // Plates for the doors next door, drawn like ours and tiled the same.
+  // Plates for the doors next door, drawn like ours, one each.
   neighbours: (
     (name: "Résidence Les Jardins Magnolia", street: "31 bis rue des Chanelles"),
   ),
