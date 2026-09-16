@@ -149,7 +149,7 @@
           type = "app";
           program = "${pkgs.writeShellScriptBin "help" ''
             cat <<EOF
-            nix build .#typ              The signs no door decides, in every language
+            nix build .#typ               The signs no door decides, in every language
             nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
             nix run . -- <place.typ>      The same to_print.pdf, in your downloads or -o DIR
             nix flake show path:.         Which doors there are to build

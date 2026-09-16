@@ -69,5 +69,5 @@ Read `typ/reusable/lib.typ` and list what it draws — one line each, in the use
 `lang` — and ask them to confirm each is already on the door. Whatever is not:
 
 ```sh
-nix build "path:.#<place>" && cp result/typ/reusable/__main__.pdf .   # one version per page
+nix build .#typ && cp result/typ/reusable/__main__.pdf .   # each sign in each language, a page each
 ```
