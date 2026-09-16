@@ -28,6 +28,7 @@ Letters are adjacent with no gap, so the rows are packed by measurement in
 `cutout.typ`: Typst breaks lines at spaces, and there are none.
 
 `nearby.pdf` draws `plaques.typ`: the address plate at the size one is screwed to
-a door, tiled `print_my_address_n` times, then a competitor's board at the size it
+a door, tiled `print_my_address_n` times for our address and for each of
+`neighbours`, then a competitor's board at the size it
 fills a landscape sheet, one per page. A `\n` in a competitor's name is where its
 board breaks the line, and the tail sets smaller — where the trade suffix sits.

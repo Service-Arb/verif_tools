@@ -7,7 +7,7 @@
 #let width = 90mm
 #let plaque-height = 62mm
 
-#let plate = box(
+#let plate(a) = box(
   width: width,
   height: 32mm,
   fill: gradient.linear(rgb("#dcddd6"), rgb("#c2c3bd"), angle: 100deg),
@@ -18,8 +18,8 @@
   #set align(center + horizon)
   #set par(leading: 0.55em)
   #set text(font: "Liberation Sans", size: 13pt, fill: rgb("#2a2b29"))
-  #address.name \
-  #address.street
+  #a.name \
+  #a.street
 ]
 
 // Quartersawn stock: the grain runs the long way of the board and the bands
@@ -66,7 +66,7 @@
 
   // Inline boxes wrap at the right margin and break across pages on their own; the
   // lane between them is weak, so it collapses rather than pushing a row over.
-  range(nearby.print_my_address_n).map(_ => plate).join(h(lane, weak: true))
+  ((address,) + nearby.neighbours).map(a => range(nearby.print_my_address_n).map(_ => plate(a))).flatten().join(h(lane, weak: true))
 
   // A competitor's board is the thing in the shot, so it gets a page to itself and
   // prints as large as the paper allows — 90:62 is within a hair of landscape A4
