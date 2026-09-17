@@ -51,12 +51,17 @@ suffix goes there (`"CLO\nCoffee Co."`). No suffix, no `\n`.
 ## 4. Build — the pack is what was asked for, so always build it
 
 ```sh
-nix run . -- tmp/<place>.typ           # prints the path it wrote
-nix run . -- tmp/<place>.typ -o DIR    # DIR is a directory; the file is always to_print.pdf
+mkdir -p ~/Downloads/verif_prints
+nix run . -- tmp/<place>.typ -o ~/Downloads/verif_prints    # always writes to_print.pdf
+mv ~/Downloads/verif_prints/to_print.pdf ~/Downloads/verif_prints/"<street>_-_<postcode>.pdf"
 ```
 
-Without `-o` it lands in the user's downloads, where a second door overwrites the
-first. Hand over the path it printed, and say what is on it: the street plate,
+The name is the door — `2_Avenue_Abbé_Védrine_-_63130.pdf`, spaces as
+underscores — since every pack is otherwise called `to_print.pdf` and the second
+door would bury the first. The same door built twice overwrites itself, which is
+what re-reading it is for.
+
+Hand over the path it ends at, and say what is on it: the street plate,
 whole, over the first `n` sheets — cut the white strip off each sheet's trailing
 edge, lay each over the next, glue — then the attestation, the rent invoice
 addressed to the business at that door, our address plate tiled, the neighbour's
