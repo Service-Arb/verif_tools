@@ -8,6 +8,12 @@ A place is data, and the sources are not — nothing under `typ/` names a place
 file. `typ/__main__.typ` takes the one handed to it on the command line, asserts
 its shape, and is what a specialized sheet imports.
 
+A business outlives the door it is behind and takes several at once, so it is a
+file of its own under `examples/brands/`: the name the monogram is drawn from,
+who signs for it, how it is reached, what it is coloured in. A place imports one
+and adds what its own door decides — the trade and territory line, the phone, how
+many of each to print — so `brand` reaches a sheet as one dictionary.
+
 Which splits the sources in two, and a build is the query that picks a half:
 
 | | `nix build .#typ` | `nix build "path:.#<place>"` |
@@ -40,6 +46,7 @@ solve does knows about paper, and nothing the windowing does knows about letters
 flowchart LR
     A["address"] --> N["scripts/nearby.py<br/>Nominatim, Overpass"]
     N --> P["tmp/place.typ"]
+    BR["examples/brands/*.typ"] --> P
     P -->|--input place=| M["typ/__main__.typ"]
     M --> S["typ/signs/*"]
     M --> D["typ/documents/*"]

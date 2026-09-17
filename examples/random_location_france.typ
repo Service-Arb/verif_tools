@@ -1,6 +1,8 @@
 // One place. `typ/__main__.typ` is handed this file and checks its shape.
 // Named `<business>_-_<city>_-_<branch>`, since one business gets one per door.
 
+#import "/examples/brands/hexaclim.typ": brand as _brand
+
 #let lang = "fr"
 #let proprietaire = "SCI Les Volcans"
 
@@ -16,17 +18,14 @@
 // tall the letters to cut out come off the paper; the width records the blank.
 #let street_plate = (width: 50cm, height: 30cm)
 
-// The business as its own paper calls it. For "Aquafix Plombier Chauffagiste -
-// Lyon, Nord", `name` is "Aquafix" and `descriptor` is everything after it.
 #let brand = (
-  name: "Hexaclim",
-  descriptor: "Chauffagiste - Clermont-Ferrand Sud",
-  // The monogram is the initial; these two draw it, the card and the door sheet.
-  // Leave them out and every door's colours are the ones `typ/__main__.typ` names.
-  primary: rgb("#1d3b2a"), // the card's front, which reads white
-  accent: rgb("#c9a227"),
-  print_card_n: 1, // one card is two sides, so this many of each
-  print_sheet_n: 4,
+  _brand
+    + (
+      descriptor: "Chauffagiste - Clermont-Ferrand Sud",
+      phone: "+33 4 23 50 06 41",
+      print_card_n: 1, // one card is two sides, so this many of each
+      print_sheet_n: 4,
+    )
 )
 
 #let nearby = (

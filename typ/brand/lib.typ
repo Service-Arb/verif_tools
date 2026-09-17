@@ -1,7 +1,7 @@
 // What the business prints for itself: the sheet that goes on a door or a van,
-// and the card. The place file names the business and its two colours; the
-// drawing is the same whoever it is, so a new door redraws nothing. The neutrals
-// below are paper and ink rather than the brand's, so they stay put.
+// and the card. `brand` carries both what the business is and what this door of
+// it adds; the drawing is the same whoever it is, so a new door redraws nothing.
+// The neutrals below are paper and ink rather than the brand's, so they stay put.
 #import "../__main__.typ": address, brand, lang
 #import "../utils.typ": fit, tr, unit
 
@@ -10,15 +10,6 @@
 #let _hairline = rgb("#dce3ea")
 
 #let _labels = tr((fr: ("DIRECT", "COURRIEL", "SITE"), en: ("DIRECT", "EMAIL", "WEB")), lang)
-
-// Nothing about a door decides these, and the pack is printed before a business
-// has any of them for real.
-#let _contact = (
-  person: "Valeriy Sakharov",
-  phone: "+33 4 23 50 06 40",
-  email: "val@aquafix.top",
-  site: "aquafix.top",
-)
 
 #let _card-w = 85mm
 #let _card-h = 55mm
@@ -58,7 +49,7 @@
   place(top + left, block(inset: (x: 7mm, top: 5mm), {
     _mark(8mm, brand.accent)
     v(3mm)
-    text(size: 13pt, weight: "bold", _contact.person)
+    text(size: 13pt, weight: "bold", brand.person)
     v(3mm)
     grid(
       columns: (14mm, auto),
@@ -66,7 +57,7 @@
       row-gutter: 1.6mm,
       align: horizon,
       .._labels
-        .zip((_contact.phone, _contact.email, _contact.site))
+        .zip((brand.phone, brand.email, brand.site))
         .map(((l, v)) => (
           text(size: 6pt, weight: "medium", tracking: 0.8pt, fill: _ink-soft, l),
           text(size: 8.5pt, weight: "semibold", v),
@@ -94,8 +85,8 @@
     v(16mm)
     align(center, fit(200mm, 20pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
     v(20mm)
-    align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", _contact.phone)))
+    align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", brand.phone)))
     v(9mm)
-    align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, _contact.site))
+    align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site))
   }))
 })

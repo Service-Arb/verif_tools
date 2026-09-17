@@ -16,7 +16,12 @@
 #assert.eq(address.keys().sorted(), ("city", "name", "street"))
 #assert.eq(street_plate.keys().sorted(), ("height", "width"))
 #for (k, v) in street_plate { assert(type(v) == length, message: "street_plate." + k + " is " + repr(v) + ", not a length") }
-#assert.eq(brand.keys().sorted(), ("accent", "descriptor", "name", "primary", "print_card_n", "print_sheet_n"))
+// The brand's half of these comes from a file under `examples/brands/`, this
+// door's half from the place — asserted together, since a sheet reads them so.
+#assert.eq(
+  brand.keys().sorted(),
+  ("accent", "descriptor", "email", "name", "person", "phone", "primary", "print_card_n", "print_sheet_n", "site"),
+)
 #for k in ("primary", "accent") { assert(type(brand.at(k)) == color, message: "brand." + k + " is " + repr(brand.at(k)) + ", not a colour") }
 #assert(brand.print_card_n > 0, message: "no business cards asked for")
 #assert(brand.print_sheet_n > 0, message: "no door sheets asked for")

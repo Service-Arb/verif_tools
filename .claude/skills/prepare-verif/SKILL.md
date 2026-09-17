@@ -11,14 +11,23 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | --- | --- |
 | `address.street`, `address.city` | the postal line |
 | `proprietaire` | landlord on the attestation and the rent invoice |
-| `brand.name`, `brand.descriptor` | the business, and the trade and territory line under it |
-| `brand.primary`, `brand.accent` | its two colours, only when the user names them |
+| `brand.descriptor` | the trade and territory line under the name |
+| `brand.phone` | the number on this door's card and sheet |
 
-The logo is the business's initial in a six-sided ring, so a name is the whole of
-it and nothing draws a file. `brand.primary` fills the card's front and carries
-white type, so it has to be dark; `brand.accent` picks out the descriptor, the
-rule and the ring. Leave both out — which is the usual case — and the pack takes
-the pair `typ/__main__.typ` names.
+The business itself is a file, not a field — `examples/brands/<brand>.typ`, one
+per business however many doors it takes:
+
+| | |
+| --- | --- |
+| `name` | what it is called, and so the initial the monogram is drawn from |
+| `person`, `email`, `site` | who signs for it and how it is reached |
+| `primary`, `accent` | its two colours, only when the user names them |
+
+Read that file if the brand already has one and change nothing; write it from
+what the user gives if it does not. `primary` fills the card's front and carries
+white type, so it has to be dark; `accent` picks out the descriptor, the rule and
+the ring. Leave both out — the usual case — and the pack takes the pair
+`typ/__main__.typ` names.
 
 `lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
 `brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —
@@ -48,9 +57,18 @@ Ask the user only for what neither OSM nor the web gives up.
 
 ## 3. Write the place
 
-`tmp/<business>_-_<city>_-_<branch>.typ`, shaped like the file under `examples/`,
-which `typ/__main__.typ` asserts. `tmp/` is untracked, so a real door stays out of
-the repo.
+`tmp/<business>_-_<city>_-_<branch>.typ`, shaped like the places under
+`examples/`, which `typ/__main__.typ` asserts. `tmp/` is untracked, so a real
+door stays out of the repo — but a brand is not a door, and its file stays in
+`examples/brands/`, where the next place can import it:
+
+```typst
+#import "/examples/brands/aquafix.typ": brand as _brand
+#let brand = _brand + (descriptor: ..., phone: ..., print_card_n: 2, print_sheet_n: 4)
+```
+
+A name in `tmp/` hides the same name in `examples/`, so never park a copy of an
+example there.
 
 A `\n` in a board's name breaks its line and sets what follows smaller — the trade
 suffix goes there (`"CLO\nCoffee Co."`). No suffix, no `\n`.
