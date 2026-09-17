@@ -11,8 +11,8 @@
 // `name` is what the plate on the building calls the place; the documents quote
 // street and city as the one line a notary would write.
 #let address = (
-  name: "Le Clos Fleuri",
-  street: "36 rue des Chanelles",
+  name: "Montjuzet", // the copropriété registered at this number
+  street: "55 rue des Chanelles",
   city: "63100 Clermont-Ferrand",
 )
 
@@ -38,13 +38,15 @@
   // plaque each. A "\n" is where that plaque breaks its line, and what follows is
   // set smaller — where the trade suffix sits on a real one.
   other_businesses: (
-    "Perle de Beauté\nInstitut de beauté", // 27 rue des Chanelles, 30m
-    "Cordonnerie", // 106m
-    "Le Fournil des Chanelles\nBoulangerie", // 113m
+    "Chanturgue Immo\nAgence immobilière", // 72m
+    // the 106m door is a C.vélo stand and the 291m one an Auchan, both of which
+    // a reader knows without walking to them
+    "Esthétic Beauty\nInstitut de beauté", // 16 rue Châteaubriand, 220m
+    "Perle de Beauté\nInstitut de beauté", // 27 rue des Chanelles, 226m
   ),
   // Plates for the doors next door, drawn like ours, one each.
   neighbours: (
-    (name: "Résidence Les Jardins Magnolia", street: "31 bis rue des Chanelles"),
+    (name: "Résidence Bel Horizon", street: "61 rue des Chanelles"), // 50m
   ),
   print_my_address_n: 3,
 )
