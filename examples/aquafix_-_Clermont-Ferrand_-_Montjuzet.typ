@@ -32,7 +32,7 @@
   other_businesses: (
     "Perle de Beauté\nInstitut de beauté", // 27 rue des Chanelles, 30m
     "Cordonnerie", // 106m
-    "Auchan\nSupermarché", // 113m
+    "Le Fournil des Chanelles\nBoulangerie", // 113m
   ),
   // Plates for the doors next door, drawn like ours, one each.
   neighbours: (

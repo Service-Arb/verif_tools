@@ -33,7 +33,9 @@ unless the user gives their own landlord.
 - `neighbours` — the closest door that is not ours, its name found the same way.
 - `other_businesses` — the closest three named businesses, whatever they sell. A
   car park counts as readily as a shop; the board only has to read as a door
-  beside ours.
+  beside ours. Pass over the names a reader already knows — a supermarket chain,
+  a bank, a fast-food brand: those doors carry a shopfront, not a plaque, and the
+  reader can check them from memory. Take the next one out instead.
 
 Ask the user only for what neither OSM nor the web gives up.
 
