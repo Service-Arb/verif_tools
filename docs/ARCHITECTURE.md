@@ -1,8 +1,8 @@
 # Architecture
 
-One door's worth of paper: a street plate to cut out, the landlord's attestation
-and rent invoice, the plaques of the neighbour and of the other businesses
-nearby, and what the business hangs and hands out itself.
+One door's worth of paper: a street plate, the landlord's attestation and rent
+invoice, the plaques of the neighbour and of the other businesses nearby, and
+what the business hangs and hands out itself.
 
 A place is data, and the sources are not — nothing under `typ/` names a place
 file. `typ/__main__.typ` takes the one handed to it on the command line, asserts
@@ -30,6 +30,11 @@ A drawing says whether it wants the paper to itself, and a document is `pack`
 over a list of them: the pages in the order handed over, then the pieces tiled
 onto what is left. So a plate and a card share a sheet instead of each opening
 one, and what decides that is the drawing rather than the document.
+
+A drawing larger than the paper hands over several pages instead of one, and
+windows itself onto them: `signs/plate.typ` solves the street plate at its real
+size first, and only then cuts that one drawing into overlapping A4. Nothing the
+solve does knows about paper, and nothing the windowing does knows about letters.
 
 ```mermaid
 flowchart LR

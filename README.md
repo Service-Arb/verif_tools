@@ -20,9 +20,9 @@ Some sheets are the same for all addresses. Build them with no place file:
 nix build .#typ
 ```
 
-This makes one PDF for each: the signs in `result/typ/reusable/`, the letters to
-cut out and the plate colour in `result/typ/signs/`. A sign has one PDF for each
-language. Print the one you want.
+This makes one PDF for each: the signs in `result/typ/reusable/`, and the plate
+colour in `result/typ/signs/`. A sign has one PDF for each language. Print the
+one you want.
 
 For one address, write a place file into `tmp/`. Then build the sheets for it:
 
@@ -34,6 +34,10 @@ The package name is the file name without `.typ`. Use `path:`, because git does
 not track `tmp/`. A plain `.` shows nix only the tracked files.
 
 This makes `result/typ/to_print.pdf`. Print it, and cut out the parts.
+
+The street plate is on the first sheets. It is wider than one sheet, so it uses
+more than one. Cut the white edge off each of these sheets. Then put each sheet
+on the next sheet and glue it. The letters continue across the join.
 
 To get that file in your download directory, use this:
 

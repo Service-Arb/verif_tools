@@ -15,8 +15,8 @@ description: Turn an address into a printable verification pack — write tmp/<p
 
 `lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
 `brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —
-the blank the street plate is cut from, and what sizes the letters — unless the
-user says otherwise.
+the blank the street plate is cut from, and so both how tall its letters are and
+how many A4 sheets it spans — unless the user says otherwise.
 The rest of the letterhead — address, e-mail, SIREN, signatory — is fixed in
 `typ/documents/bailleur.typ` to `SCI Les Volcans`, so `proprietaire` is that name
 unless the user gives their own landlord.
@@ -54,10 +54,11 @@ nix run . -- tmp/<place>.typ -o DIR    # DIR is a directory; the file is always 
 ```
 
 Without `-o` it lands in the user's downloads, where a second door overwrites the
-first. Hand over the path it printed, and say what is on it: the street letters to
-cut out, the attestation, the rent invoice addressed to the business at that
-door, our address plate tiled, the neighbour's plate, one
-business board per page, the cards to cut out, and the door sheets.
+first. Hand over the path it printed, and say what is on it: the street plate,
+whole, over the first `n` sheets — cut the white strip off each sheet's trailing
+edge, lay each over the next, glue — then the attestation, the rent invoice
+addressed to the business at that door, our address plate tiled, the neighbour's
+plate, one business board per page, the cards to cut out, and the door sheets.
 
 `nix build "path:.#<place>"` draws every sheet on its own under `result/typ/` —
 a symlink into the store, not something to hand over.

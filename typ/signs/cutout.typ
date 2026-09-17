@@ -1,25 +1,10 @@
+// The hand-cut fallback: caps to cut out one by one and glue onto a blue
+// background, for when the plate cannot be printed whole (`plate.typ`).
 #import "../__main__.typ": street_plate
 #import "../utils.typ": margin, unit
+#import "plate.typ": cap_frac
 
-// Measured off a Lyon plaque ("AVENUE THIERS", 6eme arrt): the caps span 0.211 of
-// the plate's height, whatever blank the plate is cut from.
-#let cap = 0.211 * street_plate.height
-
-// What a letter sheet keeps of a name: the caps, unaccented, in reading order.
-#let dropped = "0123456789 -'.,"
-#let letters(s) = {
-  str
-    .normalize(upper(s), form: "nfd")
-    .codepoints()
-    .filter(c => {
-      let p = c.to-unicode()
-      if 0x300 <= p and p <= 0x36f { return false }
-      if 0x41 <= p and p <= 0x5a { return true }
-      assert(c in dropped, message: repr(c) + " in " + repr(s) + " is neither a cap nor one of " + repr(dropped))
-      false
-    })
-    .join()
-}
+#let cap = cap_frac * street_plate.height
 
 #let sheet(glyphs) = unit(full_page: true, {
   assert(glyphs.len() > 0, message: "nothing to cut out")

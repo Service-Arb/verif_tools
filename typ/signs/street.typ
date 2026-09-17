@@ -1,4 +1,4 @@
-#import "../__main__.typ": address
+#import "../__main__.typ": address, street_plate
 #import "../utils.typ": pack
-#import "cutout.typ": letters, sheet
-#pack((sheet(letters(address.street)),))
+#import "plate.typ": sheets
+#pack(sheets(address.street, ..street_plate))
