@@ -24,7 +24,13 @@ This makes one PDF for each: the signs in `result/typ/reusable/`, and the plate
 colour in `result/typ/signs/`. A sign has one PDF for each language. Print the
 one you want.
 
-For one address, write a place file into `tmp/`. Then build the sheets for it:
+Each business is a file in `examples/brands/`. It holds the name, the contact and
+the two colours. One business can have many addresses, and they all read this
+file.
+
+For one address, write a place file into `tmp/`. The place file imports a brand,
+and adds what this address gives: the trade line, the phone, and the count of
+each sheet. Then build the sheets for it:
 
 ```sh
 nix build "path:.#<place>"
