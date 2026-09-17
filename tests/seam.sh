@@ -6,30 +6,41 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-place=/examples/random_location_france.typ
+places=("$@")
+if [ ${#places[@]} -eq 0 ]; then
+  places=(
+    /examples/random_location_france.typ # AVENUE DES / LANDAIS
+    /examples/aquafix_-_Clermont-Ferrand_-_Montjuzet.typ # RUE DES / CHANELLES
+  )
+fi
 paper_mm=210
 bleed_mm=0.6
 overlap_mm=20
 ppi=300
 tol_px=2
 
+fonts="$(nix build nixpkgs#liberation_ttf --no-link --print-out-paths)/share/fonts/truetype"
 out=$(mktemp -d)
 trap 'rm -rf "$out"' EXIT
 
-typst compile --root . --ignore-system-fonts --input "place=$place" \
-  --font-path "$(nix build nixpkgs#liberation_ttf --no-link --print-out-paths)/share/fonts/truetype" \
-  --format png --ppi "$ppi" typ/signs/street.typ "$out/p{p}.png"
+for place in "${places[@]}"; do
+  dir="$out/$(basename "$place" .typ)"
+  mkdir -p "$dir"
 
-python3 - "$out" "$paper_mm" "$bleed_mm" "$overlap_mm" "$ppi" "$tol_px" <<'PY'
+  typst compile --root . --ignore-system-fonts --input "place=$place" \
+    --font-path "$fonts" \
+    --format png --ppi "$ppi" typ/signs/street.typ "$dir/p{p}.png"
+
+  python3 - "$dir" "$paper_mm" "$bleed_mm" "$overlap_mm" "$ppi" "$tol_px" "$place" <<'PY'
 import glob, subprocess, sys
 
-out = sys.argv[1]
-paper, bleed, overlap, ppi, tol = map(float, sys.argv[2:])
+out, place = sys.argv[1], sys.argv[7]
+paper, bleed, overlap, ppi, tol = map(float, sys.argv[2:7])
 px = lambda mm: round(mm / 25.4 * ppi)
 fail = []
 
 pages = sorted(glob.glob(out + "/p*.png"), key=lambda p: int(p[len(out) + 2:-4]))
-assert len(pages) > 1, "the example place spans one sheet; nothing to seam"
+assert len(pages) > 1, place + " spans one sheet; nothing to seam"
 
 sheets = []
 for page in pages:
@@ -81,6 +92,7 @@ for k, (above, below) in enumerate(zip(sheets, sheets[1:])):
         if abs(a0 - b0) > tol or abs(a1 - b1) > tol:
             fail.append(f"sheet {k + 1}/{k + 2}: a stroke runs {a0}-{a1} above and {b0}-{b1} below, past {tol:.0f}px")
 
-print("\n".join(fail) or f"ok: {len(pages)} sheets, {len(strokes(sheets[0], paper - bleed - inset))} strokes at the first seam")
+print("\n".join(fail) or f"ok: {place}, {len(pages)} sheets, {len(strokes(sheets[0], paper - bleed - inset))} strokes at the first seam")
 sys.exit(1 if fail else 0)
 PY
+done
