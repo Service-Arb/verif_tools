@@ -62,6 +62,11 @@ edge, lay each over the next, glue — then the attestation, the rent invoice
 addressed to the business at that door, our address plate tiled, the neighbour's
 plate, one business board per page, the cards to cut out, and the door sheets.
 
+Every sheet of the pack is cut, glued or hung by its front, and a card carries its
+two faces side by side — so tell the user to turn duplex off in the print dialog
+(**Two-Sided: Off**, `Recto verso : non`, `lp -o sides=one-sided`) before they
+send it.
+
 `nix build "path:.#<place>"` draws every sheet on its own under `result/typ/` —
 a symlink into the store, not something to hand over.
 
