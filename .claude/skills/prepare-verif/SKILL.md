@@ -62,10 +62,11 @@ edge, lay each over the next, glue — then the attestation, the rent invoice
 addressed to the business at that door, our address plate tiled, the neighbour's
 plate, one business board per page, the cards to cut out, and the door sheets.
 
-Every sheet of the pack is cut, glued or hung by its front, and a card carries its
-two faces side by side — so tell the user to turn duplex off in the print dialog
-(**Two-Sided: Off**, `Recto verso : non`, `lp -o sides=one-sided`) before they
-send it.
+The pack asks the printer for one side and full size, and only Acrobat reads that
+— tell the user to set **Two-Sided: Off** and **Scale: 100%** in the dialog
+(`lp -o sides=one-sided -o fit-to-page=false`) before they send it. A sheet
+printed on both sides is cut through what is on its back, and one scaled to fit
+breaks the join between the street plate's sheets.
 
 `nix build "path:.#<place>"` draws every sheet on its own under `result/typ/` —
 a symlink into the store, not something to hand over.

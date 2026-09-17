@@ -32,6 +32,21 @@
           exec ${pkgs.typstyle}/bin/typstyle --line-width 190 --indent-width 2 "$@"
         '';
 
+        # A sheet is cut, glued or hung by its front, and the plate only joins at
+        # full size. The PDF says so, but only Acrobat reads it — the print dialog
+        # is where the user has to set it.
+        one-sided = pkgs.writers.writePython3Bin "one-sided" { libraries = [ pkgs.python3Packages.pypdf ]; } ''
+          import sys
+
+          from pypdf import PdfWriter
+
+          w = PdfWriter(clone_from=sys.argv[1])
+          p = w.create_viewer_preferences()
+          p.duplex = "/Simplex"
+          p.print_scaling = "/None"
+          w.write(sys.argv[1])
+        '';
+
         # A .typ nothing else imports is a document, and compiles to the same path
         # under $out; the rest are libraries, and typst would render them as a
         # blank page rather than say so. The letters under signs/ are cut to a
@@ -44,7 +59,7 @@
           inherit name;
           src = ./.;
 
-          nativeBuildInputs = [ pkgs.typst ];
+          nativeBuildInputs = [ pkgs.typst one-sided ];
 
           buildPhase = ''
             : > edges
@@ -80,6 +95,7 @@
               typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
                 --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
                 "$f" "$out/''${f%.typ}.pdf"
+              one-sided "$out/''${f%.typ}.pdf"
             done
           '';
 

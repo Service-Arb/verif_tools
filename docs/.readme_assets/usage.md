@@ -19,6 +19,16 @@ not track `tmp/`. A plain `.` shows nix only the tracked files.
 
 This makes `result/typ/to_print.pdf`. Print it, and cut out the parts.
 
+Print one side of each sheet, at full size. The PDF asks for this, but many
+printer dialogs do not obey. Set these in the dialog:
+
+| setting | value |
+| --- | --- |
+| Two-Sided | Off |
+| Scale | 100% |
+
+With the `lp` command, use `-o sides=one-sided -o fit-to-page=false`.
+
 The street plate is on the first sheets. It is wider than one sheet, so it uses
 more than one. Cut the white edge off each of these sheets. Then put each sheet
 on the next sheet and glue it. The letters continue across the join.
