@@ -26,6 +26,11 @@ Anything the stock draws with has to be place-free too, so a drawing sits apart
 from the sheet that specializes it: `signs/doorplate.typ` is the plate and the
 board, `signs/plaques.typ` is this address tiled across them.
 
+A drawing says whether it wants the paper to itself, and a document is `pack`
+over a list of them: the pages in the order handed over, then the pieces tiled
+onto what is left. So a plate and a card share a sheet instead of each opening
+one, and what decides that is the drawing rather than the document.
+
 ```mermaid
 flowchart LR
     A["address"] --> N["scripts/nearby.py<br/>Nominatim, Overpass"]

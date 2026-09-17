@@ -1,2 +1,3 @@
+#import "../utils.typ": pack
 #import "cutout.typ": sheet
-#sheet("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+#pack((sheet("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),))

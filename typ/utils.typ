@@ -71,6 +71,33 @@
   draw(calc.min(cap, probe * (width / measure(draw(probe)).width)))
 }
 
+// what a desktop printer refuses to reach
+#let margin = 10mm
+
+// Whether a drawing wants the paper to itself. What does not is a piece, and a
+// piece shares a sheet with the next one.
+#let unit(body, full_page: false) = (body: body, full_page: full_page)
+
+// One pass through the printer: the pages in the order they were handed over,
+// then the pieces onto what is left. Pieces are inline boxes with a weak nothing
+// between them, so they tile edge to edge — one cut frees the two it runs
+// between — wrap at the right margin, and break onto a further sheet on their own.
+#let pack(units) = {
+  for u in units {
+    assert.eq(u.keys().sorted(), ("body", "full_page"), message: "not something to print: " + repr(u))
+  }
+  let pages = units.filter(u => u.full_page).map(u => u.body)
+  let pieces = units.filter(u => not u.full_page).map(u => u.body)
+
+  pages.join(pagebreak(weak: true))
+  if pieces.len() > 0 {
+    if pages.len() > 0 { pagebreak(weak: true) }
+    set page(paper: "a4", margin: margin)
+    set par(leading: 0pt, spacing: 0pt, justify: false)
+    pieces.join(h(0pt, weak: true))
+  }
+}
+
 // Doubles as Typst's own `text(lang:)` codes.
 #let langs = ("fr", "en")
 

@@ -1,10 +1,9 @@
 #import "../__main__.typ": street_plate
+#import "../utils.typ": margin, unit
 
 // Measured off a Lyon plaque ("AVENUE THIERS", 6eme arrt): the caps span 0.211 of
 // the plate's height, whatever blank the plate is cut from.
 #let cap = 0.211 * street_plate.height
-// what a desktop printer refuses to reach
-#let margin = 10mm
 
 // What a letter sheet keeps of a name: the caps, unaccented, in reading order.
 #let dropped = "0123456789 -'.,"
@@ -22,7 +21,7 @@
     .join()
 }
 
-#let sheet(glyphs) = {
+#let sheet(glyphs) = unit(full_page: true, {
   assert(glyphs.len() > 0, message: "nothing to cut out")
 
   set page(paper: "a4", margin: margin)
@@ -60,4 +59,4 @@
     }
     for row in rows { text(size: size, row.join()) + parbreak() }
   }
-}
+})

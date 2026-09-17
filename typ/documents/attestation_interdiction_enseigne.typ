@@ -1,10 +1,10 @@
 #import "../__main__.typ": address, proprietaire
-#import "../utils.typ": format-date, tr
+#import "../utils.typ": format-date, tr, unit
 #import "bailleur.typ": coordonnees, letterhead, signataire, signature, ville
 
 #let adresse_local = address.street + ", " + address.city
 
-#let attestation(lang: "fr", date: none) = {
+#let attestation(lang: "fr", date: none) = unit(full_page: true, {
   let s = tr(
     (
       fr: (
@@ -100,4 +100,4 @@
     align: (left, top),
     signature(s.signature), coordonnees(lang),
   )
-}
+})

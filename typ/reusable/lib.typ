@@ -1,6 +1,6 @@
 // Signs that name no place: the same one hangs on any door of any business, so
 // the caller passes a language and nothing else.
-#import "../utils.typ": fit, tr
+#import "../utils.typ": fit, tr, unit
 
 // ISO 7010 safety red, and the near-black signage is printed in rather than the
 // paper's own black.
@@ -22,7 +22,7 @@
   place(center + horizon, rotate(45deg, rect(width: size * 0.82, height: size * 0.125, fill: _red)))
 })
 
-#let notice(lang) = {
+#let notice(lang) = unit(full_page: true, {
   let w = _words(lang)
   set page(paper: "a4", margin: 20mm, fill: white)
   set text(font: "Liberation Sans", fill: _ink)
@@ -35,4 +35,4 @@
     v(8mm)
     align(center, fit(150mm, 20pt, sz => text(size: sz, weight: "regular", w.sub)))
   }))
-}
+})

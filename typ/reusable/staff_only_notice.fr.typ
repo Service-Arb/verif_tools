@@ -1,2 +1,3 @@
+#import "../utils.typ": pack
 #import "lib.typ": notice
-#notice("fr")
+#pack((notice("fr"),))

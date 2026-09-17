@@ -2,7 +2,7 @@
 // and the postal line come from the place; a bill addressed to them there is the
 // piece of paper a verifier asks for.
 #import "../__main__.typ": address, brand
-#import "../utils.typ": digit-code, format-date, tr
+#import "../utils.typ": digit-code, format-date, tr, unit
 #import "bailleur.typ": coordonnees, letterhead, panel, rule, signature
 
 #let adresse_local = address.street + ", " + address.city
@@ -27,7 +27,7 @@
   if lang == "fr" { n + "," + f + "\u{00A0}€" } else { "€" + n + "." + f }
 }
 
-#let facture(lang: "fr", date: none) = {
+#let facture(lang: "fr", date: none) = unit(full_page: true, {
   // A month of rent is billed for the month it falls in.
   let debut = datetime(year: date.year(), month: date.month(), day: 1)
   let suivant = if date.month() == 12 {
@@ -195,4 +195,4 @@
     align: (left, top),
     signature(s.signature), coordonnees(lang),
   )
-}
+})

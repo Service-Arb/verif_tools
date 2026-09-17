@@ -28,8 +28,8 @@ span across. 30cm of plate puts the caps at 6.3cm.
 Letters are adjacent with no gap, so the rows are packed by measurement in
 `cutout.typ`: Typst breaks lines at spaces, and there are none.
 
-`nearby.pdf` draws `plaques.typ`: the address plate at the size one is screwed to
-a door, tiled `print_my_address_n` times for our address and once for each of
-`neighbours`, then the board of each of `other_businesses` at the size it
-fills a landscape sheet, one per page. A `\n` in a name is where its board breaks
-the line, and the tail sets smaller — where the trade suffix sits.
+`nearby.pdf` draws `plaques.typ`: the board of each of `other_businesses` at the
+size it fills a landscape sheet, one per page, then the address plate at the size
+one is screwed to a door — ours `print_my_address_n` times and one for each of
+`neighbours`, tiled onto as few sheets as they fit. A `\n` in a name is where its
+board breaks the line, and the tail sets smaller — where the trade suffix sits.
