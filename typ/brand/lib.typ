@@ -1,13 +1,12 @@
 // What the business prints for itself: the sheet that goes on a door or a van,
-// and the card. The place file names the business; the mark and the colours are
-// the same whoever it is, so a new door redraws nothing.
+// and the card. The place file names the business and its two colours; the
+// drawing is the same whoever it is, so a new door redraws nothing. The neutrals
+// below are paper and ink rather than the brand's, so they stay put.
 #import "../__main__.typ": address, brand, lang
 #import "../utils.typ": fit, tr, unit
 
 #let _ink = rgb("#051726")
 #let _ink-soft = rgb("#5a6b7c")
-#let _navy = rgb("#0a2540")
-#let _copper = rgb("#c2703d")
 #let _hairline = rgb("#dce3ea")
 
 #let _labels = tr((fr: ("DIRECT", "COURRIEL", "SITE"), en: ("DIRECT", "EMAIL", "WEB")), lang)
@@ -24,7 +23,8 @@
 #let _card-w = 85mm
 #let _card-h = 55mm
 
-// A monogram: one drawing that reads as a logo whatever the business is called.
+// A monogram: the business's initial in a ring of six sides, so a name is all a
+// logo takes.
 #let _mark(size, fill) = box(width: size, height: size, {
   place(center + horizon, polygon.regular(size: size, vertices: 6, stroke: (paint: fill, thickness: size / 11)))
   place(
@@ -37,26 +37,26 @@
   columns: 2,
   column-gutter: size * 0.42,
   align: horizon,
-  _mark(size * 1.25, _copper), text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name)),
+  _mark(size * 1.25, brand.accent), text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name)),
 )
 
-#let _front = box(width: _card-w, height: _card-h, fill: _navy, {
+#let _front = box(width: _card-w, height: _card-h, fill: brand.primary, {
   set text(font: "Liberation Sans")
   place(center + horizon, stack(
     dir: ttb,
     spacing: 7mm,
     align(center, fit(58mm, 22pt, sz => _lockup(sz, white))),
-    align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: _copper, upper(brand.descriptor)))),
+    align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: brand.accent, upper(brand.descriptor)))),
   ))
 })
 
 #let _back = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
   set text(font: "Liberation Sans", fill: _ink)
-  place(top + left, rect(width: _card-w, height: 2mm, fill: _copper))
+  place(top + left, rect(width: _card-w, height: 2mm, fill: brand.accent))
   // placed rather than flowed, or the face's baseline is its last line rather
   // than its edge, and it hangs below the front beside it
   place(top + left, block(inset: (x: 7mm, top: 5mm), {
-    _mark(8mm, _copper)
+    _mark(8mm, brand.accent)
     v(3mm)
     text(size: 13pt, weight: "bold", _contact.person)
     v(3mm)
@@ -92,7 +92,7 @@
   align(center + horizon, block(width: 100%, {
     align(center, fit(200mm, 90pt, sz => _lockup(sz, _ink)))
     v(16mm)
-    align(center, fit(200mm, 20pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.18, fill: _copper, upper(brand.descriptor))))
+    align(center, fit(200mm, 20pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
     v(20mm)
     align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", _contact.phone)))
     v(9mm)

@@ -21,6 +21,10 @@
 #let brand = (
   name: "Hexaclim",
   descriptor: "Chauffagiste - Clermont-Ferrand Sud",
+  // The monogram is the initial; these two draw it, the card and the door sheet.
+  // Leave them out and every door's colours are the ones `typ/__main__.typ` names.
+  primary: rgb("#1d3b2a"), // the card's front, which reads white
+  accent: rgb("#c9a227"),
   print_card_n: 1, // one card is two sides, so this many of each
   print_sheet_n: 4,
 )

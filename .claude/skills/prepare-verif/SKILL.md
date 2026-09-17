@@ -12,6 +12,13 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | `address.street`, `address.city` | the postal line |
 | `proprietaire` | landlord on the attestation and the rent invoice |
 | `brand.name`, `brand.descriptor` | the business, and the trade and territory line under it |
+| `brand.primary`, `brand.accent` | its two colours, only when the user names them |
+
+The logo is the business's initial in a six-sided ring, so a name is the whole of
+it and nothing draws a file. `brand.primary` fills the card's front and carries
+white type, so it has to be dark; `brand.accent` picks out the descriptor, the
+rule and the ring. Leave both out — which is the usual case — and the pack takes
+the pair `typ/__main__.typ` names.
 
 `lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
 `brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —
