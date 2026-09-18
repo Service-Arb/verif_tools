@@ -39,17 +39,9 @@ says, then what the brand publishes, then nothing.
 each door; `site` sits on the brand file, since a business has one. A door with
 no line of its own carries the brand's published number or none.
 
-A list of numbers whose labels are cut off, two doors and two lines with nothing
-to tell them apart, a source that gives the value but not which door it belongs
-to — none of these is knowing. **Do not close the gap by guessing**, not even
-where the odds are good and the field is one line: nothing in the pack marks a
-guess afterwards, and a door answering on the next door's number is a worse
-answer to a reviewer than a door answering on none.
-
-An optional field has an out that a required one does not. Take it: leave the
-field off, build the pack without it, and say at the end which door is missing
-what and what would settle it. The user reads that in a sentence and replies with
-the value; then it is known, and putting it in is one edit and one rebuild.
+A source that gives the value but not which door it is for is not knowing. Never
+guess an optional field: leave it off, build without it, and say at the end which
+door is missing what and what would settle it.
 
 Read that file if the brand already has one and change nothing; write it from
 what the user gives if it does not. `primary` fills the card's front and carries
