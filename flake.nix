@@ -166,7 +166,9 @@
             exit 1
           fi
 
-          built=$(nix build --no-link --print-out-paths "path:.#$(basename "$place" .typ)")
+          # a flake ref is a URL, and a French street is full of accents
+          attr=$(${pkgs.python3}/bin/python3 -c 'import sys,urllib.parse;print(urllib.parse.quote(sys.argv[1],safe=""))' "$(basename "$place" .typ)")
+          built=$(nix build --no-link --print-out-paths "path:.#$attr")
           install -m 644 "$built/typ/to_print.pdf" "$out/to_print.pdf"
           echo "$out/to_print.pdf"
         '';
