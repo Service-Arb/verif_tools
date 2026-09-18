@@ -78,6 +78,10 @@
 // piece shares a sheet with the next one.
 #let unit(body, full_page: false) = (body: body, full_page: full_page)
 
+// Where to cut. Pieces tile edge to edge, so two of the same colour meeting have
+// no seam to follow — thin and grey enough to read as a shadow at arm's length.
+#let _cut-line = 0.3pt + luma(45%)
+
 // One pass through the printer: the pages in the order they were handed over,
 // then the pieces onto what is left. Pieces are inline boxes with a weak nothing
 // between them, so they tile edge to edge — one cut frees the two it runs
@@ -94,7 +98,7 @@
     if pages.len() > 0 { pagebreak(weak: true) }
     set page(paper: "a4", margin: margin)
     set par(leading: 0pt, spacing: 0pt, justify: false)
-    pieces.join(h(0pt, weak: true))
+    pieces.map(p => box(p, stroke: _cut-line)).join(h(0pt, weak: true))
   }
 }
 
