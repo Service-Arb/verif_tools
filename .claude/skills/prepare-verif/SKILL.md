@@ -39,6 +39,18 @@ says, then what the brand publishes, then nothing.
 each door; `site` sits on the brand file, since a business has one. A door with
 no line of its own carries the brand's published number or none.
 
+A list of numbers whose labels are cut off, two doors and two lines with nothing
+to tell them apart, a source that gives the value but not which door it belongs
+to — none of these is knowing. **Do not close the gap by guessing**, not even
+where the odds are good and the field is one line: nothing in the pack marks a
+guess afterwards, and a door answering on the next door's number is a worse
+answer to a reviewer than a door answering on none.
+
+An optional field has an out that a required one does not. Take it: leave the
+field off, build the pack without it, and say at the end which door is missing
+what and what would settle it. The user reads that in a sentence and replies with
+the value; then it is known, and putting it in is one edit and one rebuild.
+
 Read that file if the brand already has one and change nothing; write it from
 what the user gives if it does not. `primary` fills the card's front and carries
 white type, so it has to be dark; `accent` picks out the descriptor, the rule and
@@ -129,13 +141,15 @@ suffix goes there (`"CLO\nCoffee Co."`). No suffix, no `\n`.
 ```sh
 mkdir -p ~/Downloads/verif_prints
 nix run . -- tmp/<place>.typ -o ~/Downloads/verif_prints    # always writes to_print.pdf
-mv ~/Downloads/verif_prints/to_print.pdf ~/Downloads/verif_prints/"<street>_-_<postcode>.pdf"
+mv ~/Downloads/verif_prints/to_print.pdf \
+   ~/Downloads/verif_prints/"<Brand>_-_<City>_-_<street>_-_<postcode>.pdf"
 ```
 
-The name is the door — `2_Avenue_Abbé_Védrine_-_63130.pdf`, spaces as
-underscores — since every pack is otherwise called `to_print.pdf` and the second
-door would bury the first. The same door built twice overwrites itself, which is
-what re-reading it is for.
+`Aquafix_-_Royat_-_2_avenue_Abbé_Védrine_-_63130.pdf`, spaces as underscores.
+Every pack is otherwise called `to_print.pdf`, so the second door would bury the
+first; brand and city lead because the folder fills up with one business's doors
+across several towns, and that is the order they are looked for in. The same door
+built twice overwrites itself, which is what re-reading it is for.
 
 Hand over the path it ends at, and say what is on it: the street plate,
 whole, over the first `n` sheets — cut the white strip off each sheet's trailing
