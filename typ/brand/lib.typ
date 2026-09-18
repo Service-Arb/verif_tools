@@ -15,14 +15,27 @@
 #let _card-h = 55mm
 
 // A monogram: the business's initial in a ring of six sides, so a name is all a
-// logo takes.
-#let _mark(size, fill) = box(width: size, height: size, {
+// logo takes. It says nothing about the trade, which is what a brand with a drawn
+// mark is buying — see `docs/logos/`.
+#let _monogram(size, fill) = box(width: size, height: size, {
   place(center + horizon, polygon.regular(size: size, vertices: 6, stroke: (paint: fill, thickness: size / 11)))
   place(
     center + horizon,
     text(size: size * 0.44, weight: "bold", fill: fill, top-edge: "cap-height", bottom-edge: "baseline", upper(brand.name.first())),
   )
 })
+
+// Height rather than width, since a drawn mark sets its own proportion and the
+// lock-up is what has to give.
+#let _mark(size, fill) = if brand.logo == none {
+  _monogram(size, fill)
+} else if brand.logo.ends-with(".svg") {
+  // typst does not resolve `currentColor`, which is how a mark carries no colour
+  // of its own; one that carries its own comes through untouched.
+  image(bytes(read(brand.logo).replace("currentColor", fill.to-hex())), format: "svg", height: size)
+} else {
+  image(brand.logo, height: size)
+}
 
 #let _lockup(size, fill) = grid(
   columns: 2,

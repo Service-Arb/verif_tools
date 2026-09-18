@@ -19,15 +19,48 @@ per business however many doors it takes:
 
 | | |
 | --- | --- |
-| `name` | what it is called, and so the initial the monogram is drawn from |
+| `name` | what it is called, and so the initial the monogram falls back to |
 | `person`, `email`, `site` | who signs for it and how it is reached |
 | `primary`, `accent` | its two colours, only when the user names them |
+| `logo` | the mark, a path from the repo root — see §1.1 |
 
 Read that file if the brand already has one and change nothing; write it from
 what the user gives if it does not. `primary` fills the card's front and carries
 white type, so it has to be dark; `accent` picks out the descriptor, the rule and
 the ring. Leave both out — the usual case — and the pack takes the pair
 `typ/__main__.typ` names.
+
+## 1.1 The logo, which is the one thing on the door that says the trade
+
+The door sheet is the largest object in the verification shot. Whoever reviews it
+is checking that this door belongs to the trade it claims, and the mark is what
+carries that before a word is read — a drop, a wrench, a length of pipe says
+plumber; a letter in a ring says nothing. **A generic mark is worse than a loud
+one.** So every brand file should end up with a `logo`, and the monogram is only
+what draws while it has none.
+
+Never invent the mark in Typst. Either the user hands one over, or one is
+generated — and what is generated is the **emblem alone**, since `typ/brand/lib.typ`
+sets the name in type beside it and a file carrying its own wordmark prints the
+name twice. Transparent background: the card's front is navy.
+
+```
+user has a file    ──▶ cp into assets/logos/<brand>.<svg|png>
+no file            ──▶ generate, crop the wordmark off, same path
+                       prompt: the trade's objects in one silhouette,
+                       flat vector, <primary>/<accent>, transparent, no text
+```
+
+Then `logo: "/assets/logos/<brand>.svg"` in the brand file, and nothing else
+changes — the card, the poster and the card back all draw it.
+
+`docs/logos/README.md` is the reference set: four marks that read as plumbing
+across the room, and what makes each of them work. Read it before generating, and
+add whatever is generated to it if it is better than what is there.
+
+An SVG written with `fill="currentColor"` comes out in `accent` wherever it lands,
+which is what `assets/logos/aquafix.svg` is. Prefer that for a one- or two-colour
+mark; hand a full-colour one over as it is.
 
 `lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
 `brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —

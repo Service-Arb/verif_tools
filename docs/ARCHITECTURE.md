@@ -9,8 +9,10 @@ file. `typ/__main__.typ` takes the one handed to it on the command line, asserts
 its shape, and is what a specialized sheet imports.
 
 A business outlives the door it is behind and takes several at once, so it is a
-file of its own under `examples/brands/`: the name the monogram is drawn from,
-who signs for it, how it is reached, what it is coloured in. A place imports one
+file of its own under `examples/brands/`: the name, who signs for it, how it is
+reached, what it is coloured in, and the mark it is drawn with — a file under
+`assets/logos/`, or its own initial in a ring when it has none, which says
+nothing about the trade and so is a placeholder (`docs/logos/`). A place imports one
 and adds what its own door decides — the trade and territory line, the phone, how
 many of each to print — so `brand` reaches a sheet as one dictionary.
 

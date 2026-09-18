@@ -9,8 +9,9 @@
 
 // The two the mark and the card are drawn in: the dark the front is filled with
 // and reads white on, and the one that picks out the descriptor and the rule. A
-// place that has its own says so and keeps the rest.
-#let brand = (primary: rgb("#0a2540"), accent: rgb("#c2703d")) + _brand
+// place that has its own says so and keeps the rest. `logo` is the drawn mark, and
+// no brand has to have one — left out, its initial is the mark.
+#let brand = (primary: rgb("#0a2540"), accent: rgb("#c2703d"), logo: none) + _brand
 
 #assert(lang in langs, message: repr(lang) + " is not one of " + repr(langs))
 #assert.eq(address.keys().sorted(), ("city", "name", "street"))
@@ -20,9 +21,10 @@
 // door's half from the place — asserted together, since a sheet reads them so.
 #assert.eq(
   brand.keys().sorted(),
-  ("accent", "descriptor", "email", "name", "person", "phone", "primary", "print_card_n", "print_sheet_n", "site"),
+  ("accent", "descriptor", "email", "logo", "name", "person", "phone", "primary", "print_card_n", "print_sheet_n", "site"),
 )
 #for k in ("primary", "accent") { assert(type(brand.at(k)) == color, message: "brand." + k + " is " + repr(brand.at(k)) + ", not a colour") }
+#assert(brand.logo == none or type(brand.logo) == str, message: "brand.logo is " + repr(brand.logo) + ", not a path from the repo root")
 #assert(brand.print_card_n > 0, message: "no business cards asked for")
 #assert(brand.print_sheet_n > 0, message: "no door sheets asked for")
 #assert(nearby.print_my_address_n > 0, message: "no copies of the address plate asked for")
