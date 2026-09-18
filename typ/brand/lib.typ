@@ -71,6 +71,7 @@
       align: horizon,
       .._labels
         .zip((brand.phone, brand.email, brand.site))
+        .filter(((_, v)) => v != none)
         .map(((l, v)) => (
           text(size: 6pt, weight: "medium", tracking: 0.8pt, fill: _ink-soft, l),
           text(size: 8.5pt, weight: "semibold", v),
@@ -97,9 +98,17 @@
     align(center, fit(200mm, 90pt, sz => _lockup(sz, _ink)))
     v(16mm)
     align(center, fit(200mm, 20pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
-    v(20mm)
-    align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", brand.phone)))
-    v(9mm)
-    align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site))
+    // the block is centred on the page, so an absent line takes its air with it
+    let reached = ()
+    if brand.phone != none {
+      reached.push(align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", brand.phone))))
+    }
+    if brand.site != none {
+      reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site)))
+    }
+    if reached.len() > 0 {
+      v(20mm)
+      stack(dir: ttb, spacing: 9mm, ..reached)
+    }
   }))
 })

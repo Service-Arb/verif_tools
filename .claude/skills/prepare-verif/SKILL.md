@@ -12,7 +12,6 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | `address.street`, `address.city` | the postal line |
 | `proprietaire` | landlord on the attestation and the rent invoice |
 | `brand.descriptor` | the trade and territory line under the name |
-| `brand.phone` | the number on this door's card and sheet |
 
 The business itself is a file, not a field — `examples/brands/<brand>.typ`, one
 per business however many doors it takes:
@@ -20,9 +19,25 @@ per business however many doors it takes:
 | | |
 | --- | --- |
 | `name` | what it is called, and so the initial the monogram falls back to |
-| `person`, `email`, `site` | who signs for it and how it is reached |
+| `person`, `email` | who signs for it and how it is reached |
 | `primary`, `accent` | its two colours, only when the user names them |
 | `logo` | the mark, a path from the repo root — see §1.1 |
+
+## 1.0 `phone` and `site`, which a reader checks before anything else
+
+Both are optional and neither has a default. Written, they go on the card's back
+and the door sheet in the largest type on the page; left out, the sheet closes
+after the trade line and nothing marks their absence.
+
+Put one in only when it is **known** — the user gave it, or it was read off the
+brand's own site or listing. A number that does not ring and a domain that does
+not resolve are the two things a reviewer can check in seconds, and either one
+failing costs more than the blank line it filled. So the order is: what the user
+says, then what the brand publishes, then nothing.
+
+`phone` sits on the place, since one business can answer on a different line at
+each door; `site` sits on the brand file, since a business has one. A door with
+no line of its own carries the brand's published number or none.
 
 Read that file if the brand already has one and change nothing; write it from
 what the user gives if it does not. `primary` fills the card's front and carries
@@ -97,8 +112,11 @@ door stays out of the repo — but a brand is not a door, and its file stays in
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as _brand
-#let brand = _brand + (descriptor: ..., phone: ..., print_card_n: 2, print_sheet_n: 4)
+#let brand = _brand + (descriptor: ..., print_card_n: 2, print_sheet_n: 4)
 ```
+
+`phone: ...` joins that dictionary when the door has a number, and is absent when
+it has none — see §1.0.
 
 A name in `tmp/` hides the same name in `examples/`, so never park a copy of an
 example there.

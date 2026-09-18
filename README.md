@@ -29,8 +29,10 @@ the two colours. One business can have many addresses, and they all read this
 file.
 
 For one address, write a place file into `tmp/`. The place file imports a brand,
-and adds what this address gives: the trade line, the phone, and the count of
-each sheet. Then build the sheets for it:
+and adds what this address gives: the trade line and the count of each sheet. Add
+the phone number only if this door has one. Add the web site to the brand file
+only if the business has one. The sheets show no line for what you do not give.
+Then build the sheets for it:
 
 ```sh
 nix build "path:.#<place>"

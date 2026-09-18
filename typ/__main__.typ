@@ -11,7 +11,7 @@
 // and reads white on, and the one that picks out the descriptor and the rule. A
 // place that has its own says so and keeps the rest. `logo` is the drawn mark, and
 // no brand has to have one — left out, its initial is the mark.
-#let brand = (primary: rgb("#0a2540"), accent: rgb("#c2703d"), logo: none) + _brand
+#let brand = (primary: rgb("#0a2540"), accent: rgb("#c2703d"), logo: none, phone: none, site: none) + _brand
 
 #assert(lang in langs, message: repr(lang) + " is not one of " + repr(langs))
 #assert.eq(address.keys().sorted(), ("city", "name", "street"))
@@ -25,6 +25,14 @@
 )
 #for k in ("primary", "accent") { assert(type(brand.at(k)) == color, message: "brand." + k + " is " + repr(brand.at(k)) + ", not a colour") }
 #assert(brand.logo == none or type(brand.logo) == str, message: "brand.logo is " + repr(brand.logo) + ", not a path from the repo root")
+// A number that does not ring and a site that does not answer are what a reader
+// checks first, so each is drawn only where the brand has one.
+#for k in ("phone", "site") {
+  assert(
+    brand.at(k) == none or type(brand.at(k)) == str,
+    message: "brand." + k + " is " + repr(brand.at(k)) + "; leave it out rather than invent one",
+  )
+}
 #assert(brand.print_card_n > 0, message: "no business cards asked for")
 #assert(brand.print_sheet_n > 0, message: "no door sheets asked for")
 #assert(nearby.print_my_address_n > 0, message: "no copies of the address plate asked for")

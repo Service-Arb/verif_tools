@@ -13,8 +13,11 @@ file of its own under `examples/brands/`: the name, who signs for it, how it is
 reached, what it is coloured in, and the mark it is drawn with — a file under
 `assets/logos/`, or its own initial in a ring when it has none, which says
 nothing about the trade and so is a placeholder (`docs/logos/`). A place imports one
-and adds what its own door decides — the trade and territory line, the phone, how
-many of each to print — so `brand` reaches a sheet as one dictionary.
+and adds what its own door decides — the trade and territory line, the number it
+answers on when it has one, how many of each to print — so `brand` reaches a
+sheet as one dictionary. What can be checked from outside is optional and has no
+default: `phone` and `site` draw only where they are known, since a line that
+does not ring reads worse than one that is not there.
 
 Which splits the sources in two, and a build is the query that picks a half:
 
