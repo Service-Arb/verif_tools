@@ -113,22 +113,34 @@
         placesIn =
           name:
           let
-            dir = ./. + "/${name}";
+            collect = dir: prefix:
+              pkgs.lib.concatLists (pkgs.lib.mapAttrsToList
+                (f: t:
+                  let
+                    relative = if prefix == "" then f else "${prefix}/${f}";
+                    path = "${dir}/${f}";
+                  in
+                  if t == "regular" && pkgs.lib.hasSuffix ".typ" f then
+                    [ relative ]
+                  else if t == "directory" then
+                    collect path relative
+                  else
+                    [ ])
+                (if builtins.pathExists dir then builtins.readDir dir else { }));
+            files = collect (./. + "/${name}") "";
           in
-          pkgs.lib.mapAttrs'
-            (
-              f: _:
-              pkgs.lib.nameValuePair (pkgs.lib.removeSuffix ".typ" f) (sheets {
-                name = "${pname}-${pkgs.lib.removeSuffix ".typ" f}";
-                place = "/${name}/${f}";
-              })
-            )
-            (
-              pkgs.lib.optionalAttrs (builtins.pathExists dir) (
-                pkgs.lib.filterAttrs (f: t: t == "regular" && pkgs.lib.hasSuffix ".typ" f) (builtins.readDir dir)
-              )
-            );
+          builtins.listToAttrs (map
+            (relative:
+            let stem = pkgs.lib.removeSuffix ".typ" (builtins.baseNameOf relative);
+            in pkgs.lib.nameValuePair stem (sheets {
+              name = "${pname}-${stem}";
+              place = "/${name}/${relative}";
+            }))
+            files);
         places = placesIn "examples" // placesIn "tmp";
+
+        # Nested tmp directories keep several businesses at one physical location together.
+        # Their basenames remain the flake attributes, so service-specific packs stay distinct.
 
         # The stock a door draws from before it is a particular door.
         typ-unplaced = sheets { name = "${pname}-typ"; };
@@ -149,10 +161,23 @@
           done
           test -n "$place" || { echo "usage: nix run . -- <tmp/place.typ> [-o DIR]" >&2; exit 2; }
           test -f "$place" || { echo "no such place: $place" >&2; exit 1; }
-          case "$(dirname "$place")" in
-            tmp | ./tmp | examples | ./examples) ;;
+          case "$place" in
+            tmp/*.typ | ./tmp/*.typ | examples/*.typ | ./examples/*.typ | tmp/*/*.typ | ./tmp/*/*.typ | examples/*/*.typ | ./examples/*/*.typ) ;;
             *) echo "a place is a package, and nix reads them out of tmp/ and examples/: $place is in neither" >&2; exit 1 ;;
           esac
+
+          place_dir=$(dirname "$place")
+          place_file=$(basename "$place")
+          case "$place_dir" in
+            tmp | ./tmp) attr_name="$place_file" ;;
+            *) attr_name="$place_file" ;;
+          esac
+
+          if [ -z "$out" ]; then
+            out=$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir DOWNLOAD)
+            # what it answers when no user-dirs.dirs names one
+            if [ "$out" = "$HOME" ]; then out="$HOME/Downloads"; fi
+          fi
 
           if [ -z "$out" ]; then
             out=$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir DOWNLOAD)

@@ -1,5 +1,8 @@
 ## Conventional
 **/tmp/
+!tmp/Clermont-Ferrand_11_Rue_de_Medicis_63000/
+!tmp/Clermont-Ferrand_11_Rue_de_Medicis_63000/*.typ
+!tmp/Clermont-Ferrand_11_Rue_de_Medicis_63000/*.pdf
 **/target/
 **/debug/
 **/bin/
