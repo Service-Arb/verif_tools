@@ -109,10 +109,23 @@ Ask the user only for what neither OSM nor the web gives up.
 
 ## 3. Write the place
 
-`tmp/<business>_-_<city>_-_<branch>.typ`, shaped like the places under
-`examples/`, which `typ/__main__.typ` asserts. `tmp/` is untracked, so a real
-door stays out of the repo — but a brand is not a door, and its file stays in
-`examples/brands/`, where the next place can import it:
+`tmp/<city>_-_<service-type>_-_<service-area>_-_<address>.typ`, shaped like the
+places under `examples/`, which `typ/__main__.typ` asserts. Keep the service area
+that the business actually serves in the filename; it matters more than the exact
+municipality containing the door. `tmp/` is untracked, so a real door stays out of
+the repo — but a brand is not a door, and its file stays in `examples/brands/`,
+where the next place can import it:
+
+For example, a plumbing business at Royat can serve Clermont-Ferrand, so name the
+pack `Royat_-_Plumbing_-_Clermont-Ferrand_-_<address>.typ`, not merely
+`Royat_-_<address>.typ`.
+
+Use `Plumbing`, `House-Cleaning`, and similar stable English service labels for
+`<service-type>`; use the business's actual service area for `<service-area>`.
+
+When the service area contains several words, keep them as words joined by
+hyphens inside that field; reserve `_-_` for the four filename fields.
+
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as _brand
@@ -134,14 +147,24 @@ suffix goes there (`"CLO\nCoffee Co."`). No suffix, no `\n`.
 mkdir -p ~/Downloads/verif_prints
 nix run . -- tmp/<place>.typ -o ~/Downloads/verif_prints    # always writes to_print.pdf
 mv ~/Downloads/verif_prints/to_print.pdf \
-   ~/Downloads/verif_prints/"<Brand>_-_<City>_-_<street>_-_<postcode>.pdf"
+   ~/Downloads/verif_prints/"<City>_-_<ServiceType>_-_<ServiceArea>_-_<address>.pdf"
 ```
 
-`Aquafix_-_Royat_-_2_avenue_Abbé_Védrine_-_63130.pdf`, spaces as underscores.
-Every pack is otherwise called `to_print.pdf`, so the second door would bury the
-first; brand and city lead because the folder fills up with one business's doors
-across several towns, and that is the order they are looked for in. The same door
-built twice overwrites itself, which is what re-reading it is for.
+`Royat_-_Plumbing_-_Clermont-Ferrand_-_2_avenue_Abbé_Védrine_63130.pdf`,
+spaces as underscores. Every pack is otherwise called `to_print.pdf`, so the
+second door would bury the first; the municipality leads for locating the door,
+while the service type and especially the service area make its purpose clear.
+The brand name is not part of this filename: one brand can cover several service
+areas, and the service fields are what distinguish the packs. The same door built
+twice overwrites itself, which is what re-reading it is for.
+
+The `.typ` input follows the same four-field naming scheme:
+`<City>_-_<ServiceType>_-_<ServiceArea>_-_<address>.typ`.
+The address field may contain the street and postcode, but do not add another
+`_-_` field separator inside it.
+
+The output PDF uses the same four-field naming scheme:
+`<City>_-_<ServiceType>_-_<ServiceArea>_-_<address>.pdf`.
 
 Hand over the path it ends at, and say what is on it: the street plate,
 whole, over the first `n` sheets — cut the white strip off each sheet's trailing
