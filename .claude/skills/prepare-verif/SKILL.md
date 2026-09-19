@@ -126,11 +126,19 @@ Use `Plumbing`, `House-Cleaning`, and similar stable English service labels for
 When the service area contains several words, keep them as words joined by
 hyphens inside that field; reserve `_-_` for the four filename fields.
 
-When several businesses share one physical location, put every place config and
-its built output under one additional `tmp/<city>_<street>_<postcode>/` folder.
-Keep each config's four-field filename unchanged inside that folder so the trade
-and service area remain visible, and use the same folder for the corresponding
-PDFs.
+When several businesses share one physical location, put configs under
+`tmp/<city>_<street>_<postcode>/` and PDFs under the matching
+`~/Downloads/verif_prints/<city>_<street>_<postcode>/`. Keep each four-field
+filename unchanged. Never put generated PDFs in `tmp/`.
+
+For that case, build each config with `-o` set to the nested Downloads folder,
+then rename its `to_print.pdf` there to the config's four-field `.pdf` name.
+For a single business, keep the flat `~/Downloads/verif_prints/` output folder.
+
+```typst
+#import "/examples/brands/aquafix.typ": brand as _brand
+#let brand = _brand + (descriptor: ..., print_card_n: 2, print_sheet_n: 4)
+```
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as _brand
