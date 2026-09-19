@@ -1,66 +1,50 @@
 // What the business prints for itself: the sheet that goes on a door or a van,
-// and the card. `brand` carries both what the business is and what this door of
-// it adds; the drawing is the same whoever it is, so a new door redraws nothing.
-// The neutrals below are paper and ink rather than the brand's, so they stay put.
-#import "../__main__.typ": address, brand, lang
+// and the card. The brand is explicit so several businesses can share one place.
+#import "../__main__.typ": address, lang
 #import "../utils.typ": fit, tr, unit
 
 #let _ink = rgb("#051726")
 #let _ink-soft = rgb("#5a6b7c")
 #let _hairline = rgb("#dce3ea")
-
 #let _labels = tr((fr: ("DIRECT", "COURRIEL", "SITE"), en: ("DIRECT", "EMAIL", "WEB")), lang)
-
 #let _card-w = 85mm
 #let _card-h = 55mm
 
-// A monogram: the business's initial in a ring of six sides, so a name is all a
-// logo takes. It says nothing about the trade, which is what a brand with a drawn
-// mark is buying — see `docs/logos/`.
-#let _monogram(size, fill) = box(width: size, height: size, {
+#let _monogram(brand, size, fill) = box(width: size, height: size, {
   place(center + horizon, polygon.regular(size: size, vertices: 6, stroke: (paint: fill, thickness: size / 11)))
-  place(
-    center + horizon,
-    text(size: size * 0.44, weight: "bold", fill: fill, top-edge: "cap-height", bottom-edge: "baseline", upper(brand.name.first())),
-  )
+  place(center + horizon, text(size: size * 0.44, weight: "bold", fill: fill, top-edge: "cap-height", bottom-edge: "baseline", upper(brand.name.first())))
 })
 
-// Height rather than width, since a drawn mark sets its own proportion and the
-// lock-up is what has to give.
-#let _mark(size, fill) = if brand.logo == none {
-  _monogram(size, fill)
+#let _mark(brand, size, fill) = if brand.logo == none {
+  _monogram(brand, size, fill)
 } else if brand.logo.ends-with(".svg") {
-  // typst does not resolve `currentColor`, which is how a mark carries no colour
-  // of its own; one that carries its own comes through untouched.
   image(bytes(read(brand.logo).replace("currentColor", fill.to-hex())), format: "svg", height: size)
 } else {
   image(brand.logo, height: size)
 }
 
-#let _lockup(size, fill) = grid(
+#let _lockup(brand, size, fill) = grid(
   columns: 2,
   column-gutter: size * 0.42,
   align: horizon,
-  _mark(size * 1.25, brand.accent), text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name)),
+  _mark(brand, size * 1.25, brand.accent), text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name)),
 )
 
-#let _front = box(width: _card-w, height: _card-h, fill: brand.primary, {
+#let _front(brand) = box(width: _card-w, height: _card-h, fill: brand.primary, {
   set text(font: "Liberation Sans")
   place(center + horizon, stack(
     dir: ttb,
     spacing: 7mm,
-    align(center, fit(58mm, 22pt, sz => _lockup(sz, white))),
+    align(center, fit(58mm, 22pt, sz => _lockup(brand, sz, white))),
     align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: brand.accent, upper(brand.descriptor)))),
   ))
 })
 
-#let _back = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
+#let _back(brand) = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
   set text(font: "Liberation Sans", fill: _ink)
   place(top + left, rect(width: _card-w, height: 2mm, fill: brand.accent))
-  // placed rather than flowed, or the face's baseline is its last line rather
-  // than its edge, and it hangs below the front beside it
   place(top + left, block(inset: (x: 7mm, top: 5mm), {
-    _mark(8mm, brand.accent)
+    _mark(brand, 8mm, brand.accent)
     v(3mm)
     text(size: 13pt, weight: "bold", brand.person)
     v(3mm)
@@ -83,29 +67,19 @@
   place(bottom + left, dx: 7mm, dy: -6mm, text(size: 6.5pt, fill: _ink-soft, address.street + "  ·  " + address.city))
 })
 
-// One card is one piece, so the cut that frees a front frees the back that
-// belongs to it, and the faces share the edge between them.
-#let cards(n) = range(n).map(_ => unit(box(_front + _back)))
+#let cards(brand, n) = range(n).map(_ => unit(box(_front(brand) + _back(brand))))
 
-// A4 on whatever is in the office. Each line is set to the distance it is read
-// from: the lock-up from the corridor, the number from across the room.
-#let poster() = unit(full_page: true, {
+#let poster(brand) = unit(full_page: true, {
   set page(paper: "a4", flipped: true, margin: 18mm, fill: white)
   set text(font: "Liberation Sans", fill: _ink)
   set par(leading: 0pt, spacing: 0pt)
-
   align(center + horizon, block(width: 100%, {
-    align(center, fit(200mm, 90pt, sz => _lockup(sz, _ink)))
+    align(center, fit(200mm, 90pt, sz => _lockup(brand, sz, _ink)))
     v(16mm)
     align(center, fit(200mm, 20pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
-    // the block is centred on the page, so an absent line takes its air with it
     let reached = ()
-    if brand.phone != none {
-      reached.push(align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", brand.phone))))
-    }
-    if brand.site != none {
-      reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site)))
-    }
+    if brand.phone != none { reached.push(align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", brand.phone)))) }
+    if brand.site != none { reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site))) }
     if reached.len() > 0 {
       v(20mm)
       stack(dir: ttb, spacing: 9mm, ..reached)

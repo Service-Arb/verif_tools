@@ -1,7 +1,7 @@
 // What the landlord bills the business for the door it rents. The company name
 // and the postal line come from the place; a bill addressed to them there is the
 // piece of paper a verifier asks for.
-#import "../__main__.typ": address, brand
+#import "../__main__.typ": address
 #import "../utils.typ": digit-code, format-date, tr, unit
 #import "bailleur.typ": coordonnees, letterhead, panel, rule, signature
 
@@ -142,7 +142,7 @@
     [
       #strong[#s.facture_a] \
       #v(1.5mm)
-      #text(weight: "bold")[#brand.name] \
+      #text(weight: "bold")[#address.name] \
       #address.street \
       #address.city
     ],

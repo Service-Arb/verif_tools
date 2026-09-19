@@ -11,7 +11,7 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | --- | --- |
 | `address.street`, `address.city` | the postal line |
 | `proprietaire` | landlord on the attestation and the rent invoice |
-| `brand.descriptor` | the trade and territory line under the name |
+| `brands[].descriptor` | each trade and territory line under its name |
 
 The business itself is a file, not a field — `examples/brands/<brand>.typ`, one
 per business however many doors it takes:
@@ -126,16 +126,34 @@ Use `Plumbing`, `House-Cleaning`, and similar stable English service labels for
 When the service area contains several words, keep them as words joined by
 hyphens inside that field; reserve `_-_` for the four filename fields.
 
-When several businesses share one physical location, put every place config and
-its built output under one additional `tmp/<city>_<street>_<postcode>/` folder.
-Keep each config's four-field filename unchanged inside that folder so the trade
-and service area remain visible, and use the same folder for the corresponding
-PDFs.
+One place file may import several brand files. Keep the place-derived address,
+nearby businesses, landlord and print counts in the place file, and add each
+brand's place-specific descriptor and counts to `brands`:
 
 ```typst
-#import "/examples/brands/aquafix.typ": brand as _brand
-#let brand = _brand + (descriptor: ..., print_card_n: 2, print_sheet_n: 4)
+#import "/examples/brands/aquafix.typ": brand as aquafix
+#import "/examples/brands/serrunova.typ": brand as serrunova
+#let brands = (
+  aquafix + (descriptor: ..., phone: none, print_card_n: 2, print_sheet_n: 4),
+  serrunova + (descriptor: ..., phone: none, print_card_n: 2, print_sheet_n: 4),
+)
 ```
+
+A physical location has one place file and one `to_print.pdf`. Shared place
+sheets are rendered once; each configured brand then contributes its own posters
+and cards. Put the place config under `tmp/<city>_<street>_<postcode>/` when the
+location is temporary. Generated PDFs never go in `tmp/`.
+
+`nix run . -- tmp/<place>.typ` writes one PDF by default to
+`~/Downloads/verif_prints/<place>.pdf`; use `-o DIR` only when a different output
+folder is required.
+
+```typst
+#import "/examples/brands/aquafix.typ": brand as aquafix
+#let brands = (aquafix + (descriptor: ..., phone: none, print_card_n: 2, print_sheet_n: 4))
+```
+
+Each brand file remains under `examples/brands/` so another place can import it.
 
 `phone: ...` joins that dictionary when the door has a number, and is absent when
 it has none — see §1.0.
@@ -149,42 +167,18 @@ suffix goes there (`"CLO\nCoffee Co."`). No suffix, no `\n`.
 ## 4. Build — the pack is what was asked for, so always build it
 
 ```sh
-mkdir -p ~/Downloads/verif_prints
-nix run . -- tmp/<place>.typ -o ~/Downloads/verif_prints    # always writes to_print.pdf
-mv ~/Downloads/verif_prints/to_print.pdf \
-   ~/Downloads/verif_prints/"<City>_-_<ServiceType>_-_<ServiceArea>_-_<address>.pdf"
+nix run . -- tmp/<place>.typ
 ```
 
-`Royat_-_Plumbing_-_Clermont-Ferrand_-_2_avenue_Abbé_Védrine_63130.pdf`,
-spaces as underscores. Every pack is otherwise called `to_print.pdf`, so the
-second door would bury the first; the municipality leads for locating the door,
-while the service type and especially the service area make its purpose clear.
-The brand name is not part of this filename: one brand can cover several service
-areas, and the service fields are what distinguish the packs. The same door built
-twice overwrites itself, which is what re-reading it is for.
+The command writes one PDF by default to `~/Downloads/verif_prints/<place>.pdf`.
+Pass `-o DIR` only when a different output folder is required. The PDF contains
+one shared set of place-derived sheets, followed by each brand's posters and
+cards.
 
-The `.typ` input follows the same four-field naming scheme:
-`<City>_-_<ServiceType>_-_<ServiceArea>_-_<address>.typ`.
-The address field may contain the street and postcode, but do not add another
-`_-_` field separator inside it.
-
-The output PDF uses the same four-field naming scheme:
-`<City>_-_<ServiceType>_-_<ServiceArea>_-_<address>.pdf`.
-
-Hand over the path it ends at, and say what is on it: the street plate,
-whole, over the first `n` sheets — cut the white strip off each sheet's trailing
-edge, lay each over the next, glue — then the attestation, the rent invoice
-addressed to the business at that door, our address plate tiled, the neighbour's
-plate, one business board per page, the cards to cut out, and the door sheets.
-
-The pack asks the printer for one side and full size, and only Acrobat reads that
-— tell the user to set **Two-Sided: Off** and **Scale: 100%** in the dialog
-(`lp -o sides=one-sided -o fit-to-page=false`) before they send it. A sheet
-printed on both sides is cut through what is on its back, and one scaled to fit
-breaks the join between the street plate's sheets.
-
-`nix build "path:.#<place>"` draws every sheet on its own under `result/typ/` —
-a symlink into the store, not something to hand over.
+Hand over the path it ends at, and say what is on it: the street plate, the
+attestation, the rent invoice addressed to the location, our address plate tiled,
+the neighbour's plate, one business board per page, then each configured brand's
+cards and door sheets.
 
 ## 5. Then read back what the door needs that the pack does not carry
 

@@ -139,8 +139,8 @@
             files);
         places = placesIn "examples" // placesIn "tmp";
 
-        # Nested tmp directories keep several businesses at one physical location together.
-        # Their basenames remain the flake attributes, so service-specific packs stay distinct.
+        # A place owns one pack; its brand list is rendered inside that pack.
+
 
         # The stock a door draws from before it is a particular door.
         typ-unplaced = sheets { name = "${pname}-typ"; };
@@ -162,40 +162,23 @@
           test -n "$place" || { echo "usage: nix run . -- <tmp/place.typ> [-o DIR]" >&2; exit 2; }
           test -f "$place" || { echo "no such place: $place" >&2; exit 1; }
           case "$place" in
-            tmp/*.typ | ./tmp/*.typ | examples/*.typ | ./examples/*.typ | tmp/*/*.typ | ./tmp/*/*.typ | examples/*/*.typ | ./examples/*/*.typ) ;;
+            tmp/*.typ | ./tmp/*.typ | examples/*.typ | ./examples/*.typ) ;;
             *) echo "a place is a package, and nix reads them out of tmp/ and examples/: $place is in neither" >&2; exit 1 ;;
           esac
 
-          place_dir=$(dirname "$place")
-          place_file=$(basename "$place")
-          case "$place_dir" in
-            tmp | ./tmp) attr_name="$place_file" ;;
-            *) attr_name="$place_file" ;;
-          esac
-
           if [ -z "$out" ]; then
             out=$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir DOWNLOAD)
-            # what it answers when no user-dirs.dirs names one
             if [ "$out" = "$HOME" ]; then out="$HOME/Downloads"; fi
+            out="$out/verif_prints"
           fi
-
-          if [ -z "$out" ]; then
-            out=$(${pkgs.xdg-user-dirs}/bin/xdg-user-dir DOWNLOAD)
-            # what it answers when no user-dirs.dirs names one
-            if [ "$out" = "$HOME" ]; then out="$HOME/Downloads"; fi
-          fi
-          if [ ! -d "$out" ]; then
-            echo "nowhere to put the pack: $out is not a directory" >&2
-            echo "nothing on this machine says where downloads go, so name one:" >&2
-            echo "  nix run . -- $place -o <dir>" >&2
-            exit 1
-          fi
+          mkdir -p "$out"
 
           # a flake ref is a URL, and a French street is full of accents
           attr=$(${pkgs.python3}/bin/python3 -c 'import sys,urllib.parse;print(urllib.parse.quote(sys.argv[1],safe=""))' "$(basename "$place" .typ)")
           built=$(nix build --no-link --print-out-paths "path:.#$attr")
-          install -m 644 "$built/typ/to_print.pdf" "$out/to_print.pdf"
-          echo "$out/to_print.pdf"
+          output="$out/$(basename "$place" .typ).pdf"
+          install -m 644 "$built/typ/to_print.pdf" "$output"
+          echo "$output"
         '';
       in
       {
