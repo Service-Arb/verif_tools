@@ -126,6 +126,11 @@ Use `Plumbing`, `House-Cleaning`, and similar stable English service labels for
 When the service area contains several words, keep them as words joined by
 hyphens inside that field; reserve `_-_` for the four filename fields.
 
+When several businesses share one physical location, put every place config and
+its built output under one additional `tmp/<city>_<street>_<postcode>/` folder.
+Keep each config's four-field filename unchanged inside that folder so the trade
+and service area remain visible, and use the same folder for the corresponding
+PDFs.
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as _brand
