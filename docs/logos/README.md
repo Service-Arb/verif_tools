@@ -35,3 +35,12 @@ a whole lock-up, so what to keep from one is the emblem above the wordmark.
 | ![](aquafix_house_shield.png) | House, pipe, drop, wave. A domestic plumber rather than a plumber, which is what the descriptor line says in words. |
 | ![](aquafix_a_pipe.png) | The initial *is* the emblem — a monogram that took the trade on. The closest of the three to what the monogram would be if it could draw. |
 | ![](plumber_near_me_aurora.png) | Mascot, skyline, ribbon, two wrenches. Nothing here is restrained and it is still the clearest of the four about the trade, which is the point: on a door, legible beats tasteful. |
+
+
+## Supplied references
+
+- `locksmith_keycraft_reference.jpeg`: house and key locksmith direction.
+- `locksmith_securelock_reference.jpeg`: shield and key security direction.
+- `locksmith_quickkey_reference.jpeg`: lock, key and speed direction.
+- `locksmith_ironkey_reference.jpeg`: premium shield and key direction.
+- `hvac_swiftair_reference.png`: house, airflow and heat/cool HVAC direction.

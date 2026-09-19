@@ -21,7 +21,8 @@ per business however many doors it takes:
 | `name` | what it is called, and so the initial the monogram falls back to |
 | `person`, `email` | who signs for it and how it is reached |
 | `primary`, `accent` | its two colours, only when the user names them |
-| `logo` | the mark, a path from the repo root — see §1.1 |
+| `logo` | the mark, preferably SVG but any supported image path — see §1.1 |
+| `name_segments` | optional persistent colored name segments, reused on every branded sheet |
 
 ## 1.0 `phone` and `site`, which a reader checks before anything else
 
@@ -55,31 +56,47 @@ The door sheet is the largest object in the verification shot. Whoever reviews i
 is checking that this door belongs to the trade it claims, and the mark is what
 carries that before a word is read — a drop, a wrench, a length of pipe says
 plumber; a letter in a ring says nothing. **A generic mark is worse than a loud
-one.** So every brand file should end up with a `logo`, and the monogram is only
-what draws while it has none.
+one.**
 
-Never invent the mark in Typst. Either the user hands one over, or one is
-generated — and what is generated is the **emblem alone**, since `typ/brand/lib.typ`
-sets the name in type beside it and a file carrying its own wordmark prints the
-name twice. Transparent background: the card's front is navy.
+Prefer an SVG emblem when the source is an emblem, because it scales cleanly and
+can use the brand accent. But `logo` accepts any image path Typst can read: SVG,
+PNG, JPEG, or another supported raster format. A supplied full-brand image may
+contain the emblem, name, slogan and colors together. In that case preserve the
+source in `docs/logos/` or `assets/logos/`, extract a clean emblem PNG for `logo`,
+and record the extracted colors, written name, and slogan in the brand file before
+rendering. Do not replace a strong supplied reference with an invented generic
+mark.
 
 ```
-user has a file    ──▶ cp into assets/logos/<brand>.<svg|png>
-no file            ──▶ generate, crop the wordmark off, same path
-                       prompt: the trade's objects in one silhouette,
-                       flat vector, <primary>/<accent>, transparent, no text
+full brand image ──▶ save reference, extract emblem PNG, colors, name, slogan
+emblem source     ──▶ prefer assets/logos/<brand>.svg; accept .png/.jpg too
+no source         ──▶ generate an application-specific emblem, never a placeholder
 ```
 
-Then `logo: "/assets/logos/<brand>.svg"` in the brand file, and nothing else
-changes — the card, the poster and the card back all draw it.
+Then set `logo` to the extracted emblem path. The card, poster and card back all
+draw it. If the supplied image already contains the wordmark, do not place that
+full image where the pipeline expects an emblem: use the extracted emblem and
+persistent text fields instead.
 
-`docs/logos/README.md` is the reference set: four marks that read as plumbing
-across the room, and what makes each of them work. Read it before generating, and
-add whatever is generated to it if it is better than what is there.
+The visible name can be defined once with `name_segments`, then every branded
+sheet reuses it:
+
+```typst
+name_segments: (
+  (text: "Secure", color: rgb("#102A43")),
+  (text: "Lock", color: rgb("#1677D2")),
+),
+```
+
+Use this for persistent treatments such as `Secure` plus blue `Lock`. Keep the
+plain `name` as the canonical searchable name.
+
+`docs/logos/` is the reference set. Read it before creating a mark and add supplied
+references there; reference images are inputs, not disposable inspiration.
 
 An SVG written with `fill="currentColor"` comes out in `accent` wherever it lands,
 which is what `assets/logos/aquafix.svg` is. Prefer that for a one- or two-colour
-mark; hand a full-colour one over as it is.
+emblem; hand a full-colour raster over as it is when extraction would lose detail.
 
 `lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
 `brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —

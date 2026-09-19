@@ -4,5 +4,5 @@
   email: "bonjour@serrunova.fr",
   primary: rgb("#182B49"),
   accent: rgb("#F0B429"),
-  logo: "/assets/logos/serrunova.svg",
+  logo: "/assets/logos/serrunova.png",
 )

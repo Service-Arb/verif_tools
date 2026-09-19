@@ -23,11 +23,17 @@
   image(brand.logo, height: size)
 }
 
+#let _name(brand, size, fill) = if brand.name_segments == none {
+  text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name))
+} else {
+  stack(dir: ltr, spacing: 0pt, ..brand.name_segments.map(segment => text(size: size, weight: "bold", tracking: size * 0.015, fill: segment.color, upper(segment.text))))
+}
+
 #let _lockup(brand, size, fill) = grid(
   columns: 2,
   column-gutter: size * 0.42,
   align: horizon,
-  _mark(brand, size * 1.25, brand.accent), text(size: size, weight: "bold", tracking: size * 0.015, fill: fill, upper(brand.name)),
+  _mark(brand, size * 1.25, brand.accent), _name(brand, size, fill),
 )
 
 #let _front(brand) = box(width: _card-w, height: _card-h, fill: brand.primary, {
