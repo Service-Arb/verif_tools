@@ -63,7 +63,7 @@
           inherit name;
           src = ./.;
 
-          nativeBuildInputs = [ pkgs.typst one-sided ];
+          nativeBuildInputs = [ pkgs.typst pkgs.jq one-sided ];
 
           buildPhase = ''
                         : > edges
@@ -92,7 +92,7 @@
                         # was first built on; `__impure = true` if it has to follow the day
                         unset SOURCE_DATE_EPOCH
 
-                        ${pkgs.lib.optionalString (place != null) ''siren=$(unset SOURCE_DATE_EPOCH; typst query --root . --ignore-system-fonts --font-path ${pkgs.liberation_ttf}/share/fonts/truetype typ/siren.typ '<siren>' --one --field value)
+                        ${pkgs.lib.optionalString (place != null) ''siren=$(unset SOURCE_DATE_EPOCH; typst query --root . --ignore-system-fonts --font-path ${pkgs.liberation_ttf}/share/fonts/truetype typ/siren.typ '<siren>' --one --field value | jq -r .)
                         mkdir -p "$out"
                         printf '%s\n' "$siren" > "$out/SIREN.txt"
 

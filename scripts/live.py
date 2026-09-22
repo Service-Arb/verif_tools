@@ -2,7 +2,7 @@
 """What a place says, carried into Google's own pages through a Chrome that is
 already logged in, over the DevTools protocol.
 
-  live submit tmp/<place>.typ --cdp 127.0.0.1:49300 --account <gmail> --profile-id <id>
+  live submit <place> --cdp 127.0.0.1:49300
 
 `submit` walks the verification workflow to its contact form and fills
 it, and stops short of the form's own submit button.
@@ -109,23 +109,31 @@ def pages(cdp):
     return [t for t in browser(cdp, "Target.getTargets")["targetInfos"] if t["type"] == "page"]
 
 
-def profile_of(cdp, account):
-    """A tab in the Chrome profile that `account` is signed into."""
-    seen = {}
+def managed(cdp, street):
+    """The tab of a `my business` search showing the profile at `street`, with the account managing it and the profile's ID."""
+    want = words(street) - STREET_WORDS
+    found, seen = {}, []
     for t in pages(cdp):
-        if t["browserContextId"] in seen or not re.match(r"https://(support|www|mail)\.google\.com/", t["url"]):
+        if not re.match(r"https://www\.google\.[a-z.]+/search\?(.*&)?q=my\+business", t["url"]):
             continue
         try:
-            label = Tab(cdp, t["targetId"]).js("return document.querySelector('[aria-label^=\"Google Account:\"]')?.getAttribute('aria-label')")
+            card = Tab(cdp, t["targetId"]).js("""const ids = [...new Set([...document.querySelectorAll('[data-listing-id]')].map(e => e.dataset.listingId))];
+              if (ids.length !== 1) return null;
+              let e = document.querySelector('[data-listing-id]');
+              while (e && !/\\d{5}/.test(e.innerText)) e = e.parentElement;  // up to the card that carries the postcode
+              return [document.querySelector('[aria-label^="Google Account:"]').getAttribute('aria-label'), ids[0], e.innerText]""")
         except TimeoutError:
-            continue  # a discarded tab answers nothing, and another in its profile will
-        if not label:
+            continue  # a tab not loaded since Chrome restarted answers nothing
+        if not card:
             continue
-        email = re.search(r"\(([^)]+@[^)]+)\)", label)[1]
-        seen[t["browserContextId"]] = email
-        if email == account:
-            return t
-    sys.exit(f"no Chrome profile signed into {account}; signed in: {sorted(set(seen.values())) or 'none found'}")
+        account, id, text = re.search(r"\(([^)]+@[^)]+)\)", card[0])[1], card[1], card[2]
+        seen.append(f"{account} {id}")
+        if want <= words(text):
+            found[account, id] = t  # the same profile open in several tabs is one answer
+    if len(found) != 1:
+        sys.exit(f"{len(found)} profiles at {street!r} in `my business` tabs; search `my business` in the managing account's Chrome, on this place's profile. Seen: {seen or 'none'}")
+    (account, id), tab = found.popitem()
+    return tab, account, id
 
 
 def opened_by(cdp, before, prefix, timeout=20):
@@ -166,7 +174,10 @@ def prepared_docs(place, directory):
     missing = [str(path) for path in (pack, siren) if not path.is_file()]
     if missing:
         sys.exit("/prepare-verif output is missing: " + ", ".join(missing) + "; run it first or pass --docs DIR")
-    return pack, siren.read_text().strip()
+    siren = siren.read_text().strip()
+    if not re.fullmatch(r"\d{3} \d{3} \d{3}", siren):
+        sys.exit(f"{directory / 'SIREN.txt'} holds {siren!r}, not a SIREN; rerun /prepare-verif")
+    return pack, siren
 
 
 
@@ -227,7 +238,7 @@ def submit(a):
         sys.exit(f"{a.place} has brands {[b['name'] for b in place['brands']]}; name one with --brand")
     brand, address = brands[0], place["address"]
 
-    home = profile_of(a.cdp, a.account)
+    home, account, profile_id = managed(a.cdp, address["street"])
     before = {t["targetId"] for t in pages(a.cdp)}
     Tab(a.cdp, home["targetId"]).js(f"window.open({json.dumps(WORKFLOW)}, '_blank')")
     flow = opened_by(a.cdp, before, WORKFLOW)
@@ -237,8 +248,8 @@ def submit(a):
         flow.click("Start over")
     flow.text("Confirm email")
     asked = re.search(r"Is (\S+@\S+) the email address", flow.js("return page()"))[1]
-    if asked != a.account:
-        sys.exit(f"the workflow is signed in as {asked}, not {a.account}")
+    if asked != account:
+        sys.exit(f"the workflow is signed in as {asked}, not {account}")
     flow.click("Confirm")
     rows = flow.until("const r = [...document.querySelectorAll('[role=row]')].filter(r => r.querySelector('input')).map(flat); return r.length && r", "business table")
     flow.js(f"[...document.querySelectorAll('[role=row]')].filter(r => r.querySelector('input'))[{pick(rows, brand, address['street'])}].querySelector('input').click()")
@@ -261,10 +272,10 @@ def submit(a):
         flow.choose("select[name=phone]", "FR")
         flow.type("input[type=tel]", "0" + national[1])
         flow.check("phone_phone-type-mobile" if national[1][0] in "67" else "phone_phone-type-landline")
-    flow.type("input[name=customer_email_GMB_copy]", a.account)
+    flow.type("input[name=customer_email_GMB_copy]", account)
     if flow.js("return shown(document.querySelector('input[name=company_domain_field_updated1]'))"):  # asked of a Gmail account
         flow.type("input[name=company_domain_field_updated1]", brand["email"])
-    flow.type("input[name=business_nmx_id]", a.profile_id)
+    flow.type("input[name=business_nmx_id]", profile_id)
     flow.type("textarea[name=describe_issue1]", f"{brand['name']} {brand['descriptor']}, {address['street']}, {address['city']}. {DETAILS}")
     flow.type("input[name=gmb_business_domain]", f"https://{brand['site']}" if brand["site"] else "N/A")
     register_field = flow.js("return [...document.querySelectorAll('input,textarea')].filter(e => shown(e) && label(e).includes('official government register')).map(e => e.name ? `[name=${e.name}]` : '#' + e.id)")
@@ -300,23 +311,26 @@ def submit(a):
     print(f"filled for {brand['name']} at {address['street']}, not sent: {flow.js('return location.href')}")
     for name, path in files.items():
         print(f"  {name}: {path}")
+    for field, value in flow.js("return [...document.querySelectorAll('form input:not([type=hidden]), form textarea, form select')].filter(e => shown(e) && (e.type === 'file' ? e.files.length : (e.type === 'radio' || e.type === 'checkbox') ? e.checked : e.value)).map(e => [label(e) || (e.closest('label') && flat(e.closest('label'))) || e.name, e.type === 'file' ? e.files[0].name : e.type === 'select-one' ? e.selectedOptions[0].text : e.type === 'radio' || e.type === 'checkbox' ? '✓' : e.value])"):
+        print(f"  {field}: {value}")
 
 
 def main():
     p = argparse.ArgumentParser(prog="live", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="command", required=True)
     s = sub.add_parser("submit", help="fill the verification contact form for a place, up to its submit button")
-    s.add_argument("place", help="tmp/<place>.typ or examples/<place>.typ")
+    s.add_argument("place", help="tmp/<place>.typ, examples/<place>.typ, or words of a tmp/ place's name")
     s.add_argument("--cdp", required=True, help="host:port of a Chrome started with --remote-debugging-port")
-    s.add_argument("--account", required=True, help="the Google account that manages the profile")
-    s.add_argument("--profile-id", required=True, help="Business Profile ID, from the profile's advanced settings")
     s.add_argument("--docs", default="~/Downloads/verif_prints", help="directory containing /prepare-verif's place PDF and SIREN.txt")
     s.add_argument("--brand", help="which of the place's brands, when it has several")
     a = p.parse_args()
     if not Path("typ/__main__.typ").exists():
         sys.exit("run from the repository root")
-    if not a.profile_id.isdigit():
-        sys.exit(f"--profile-id is digits, not {a.profile_id!r}")
+    if not Path(a.place).is_file():
+        hits = [p for p in Path("tmp").glob("*.typ") if words(a.place) <= words(p.stem)]
+        if len(hits) != 1:
+            sys.exit(f"{len(hits)} tmp/*.typ places match {a.place!r}: {[str(p) for p in hits]}")
+        a.place = str(hits[0])
     submit(a)
 
 
