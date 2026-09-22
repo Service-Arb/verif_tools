@@ -6,7 +6,7 @@ description: Fill Google's Business Profile verification contact form for a plac
 # submit-live
 
 ```sh
-nix run .#live -- submit <place> --cdp 127.0.0.1:49300
+nix run .#live -- submit <place> --cdp 127.0.0.1:$CHROME_DEBUG_PORT
 ```
 
 `/prepare-verif` must have been run first: the command reads `<place>.pdf` and `SIREN.txt` from `--docs` (default `~/Downloads/verif_prints`).
@@ -14,7 +14,7 @@ nix run .#live -- submit <place> --cdp 127.0.0.1:49300
 Never press the form's Submit yourself.
 
 - `<place>`: a place file, or words of its name under `tmp/` (`Royat`). Several brands at the door → `--brand <name>` too.
-- `--cdp`: the user's own Chrome listens on `49300`. Say `127.0.0.1`, not `localhost`: other Chromes on this machine bind `[::1]:49300`.
+- `--cdp`: the user's own Chrome listens on `$CHROME_DEBUG_PORT`. Unset → ask the user for the debug port of their running Chrome, or offer to start one: `google-chrome-stable --remote-debugging-port=<port> --user-data-dir=<non-default dir>` (Chrome refuses the port on its default profile dir). Say `127.0.0.1`, not `localhost`: other Chromes on this machine may bind `[::1]` on the same port.
 - The managing account and the Business Profile ID are read off an open `my business` Google search showing this place's profile. None open → ask the user to open one.
 
 A tab that answers no CDP call was never loaded since Chrome restarted; ask the user to click into that window.
