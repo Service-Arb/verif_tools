@@ -66,41 +66,45 @@
           nativeBuildInputs = [ pkgs.typst one-sided ];
 
           buildPhase = ''
-            : > edges
-            for f in $(find typ -name '*.typ'); do
-              for imp in $(grep -oE '"[^"]*\.typ"' "$f" | tr -d '"' || true); do
-                case "$imp" in
-                  /*) echo "$(realpath -m "$f") $(realpath -m ".$imp")" >> edges ;;
-                  *) echo "$(realpath -m "$f") $(realpath -m "$(dirname "$f")/$imp")" >> edges ;;
-                esac
-              done
-            done
-            cut -d' ' -f2 edges | sort -u > imported
+                        : > edges
+                        for f in $(find typ -name '*.typ'); do
+                          for imp in $(grep -oE '"[^"]*\.typ"' "$f" | tr -d '"' || true); do
+                            case "$imp" in
+                              /*) echo "$(realpath -m "$f") $(realpath -m ".$imp")" >> edges ;;
+                              *) echo "$(realpath -m "$f") $(realpath -m "$(dirname "$f")/$imp")" >> edges ;;
+                            esac
+                          done
+                        done
+                        cut -d' ' -f2 edges | sort -u > imported
 
-            # whatever imports something placed is itself placed, until it settles
-            realpath -m typ/__main__.typ > placed
-            while :; do
-              was=$(wc -l < placed)
-              awk 'NR==FNR { m[$0]; next } $2 in m { print $1 }' placed edges | cat - placed | sort -u > wider
-              mv wider placed
-              test "$(wc -l < placed)" = "$was" && break
-            done
+                        # whatever imports something placed is itself placed, until it settles
+                        realpath -m typ/__main__.typ > placed
+                        while :; do
+                          was=$(wc -l < placed)
+                          awk 'NR==FNR { m[$0]; next } $2 in m { print $1 }' placed edges | cat - placed | sort -u > wider
+                          mv wider placed
+                          test "$(wc -l < placed)" = "$was" && break
+                        done
 
-            # the documents date themselves off the clock, and the sandbox pins
-            # SOURCE_DATE_EPOCH to 1970 — utils.typ refuses to render that year
-            # ponytail: nix caches on inputs, so the date is the one the store path
-            # was first built on; `__impure = true` if it has to follow the day
-            unset SOURCE_DATE_EPOCH
+                        # the documents date themselves off the clock, and the sandbox pins
+                        # SOURCE_DATE_EPOCH to 1970 — utils.typ refuses to render that year
+                        # ponytail: nix caches on inputs, so the date is the one the store path
+                        # was first built on; `__impure = true` if it has to follow the day
+                        unset SOURCE_DATE_EPOCH
 
-            for f in $(find typ -name '*.typ'); do
-              if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
-              ${pkgs.lib.optionalString (place == null) ''if grep -qxF "$(realpath -m "$f")" placed; then continue; fi''}
-              mkdir -p "$out/$(dirname "$f")"
-              typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
-                --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
-                "$f" "$out/''${f%.typ}.pdf"
-              one-sided "$out/''${f%.typ}.pdf"
-            done
+                        ${pkgs.lib.optionalString (place != null) ''siren=$(unset SOURCE_DATE_EPOCH; typst query --root . --ignore-system-fonts --font-path ${pkgs.liberation_ttf}/share/fonts/truetype typ/siren.typ '<siren>' --one --field value)
+                        mkdir -p "$out"
+                        printf '%s\n' "$siren" > "$out/SIREN.txt"
+
+            ''}            for f in $(find typ -name '*.typ'); do
+                          if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
+                          ${pkgs.lib.optionalString (place == null) ''if grep -qxF "$(realpath -m "$f")" placed; then continue; fi''}
+                          mkdir -p "$out/$(dirname "$f")"
+                          typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place} --input siren=\"$siren\""} \
+                            --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
+                            "$f" "$out/''${f%.typ}.pdf"
+                          one-sided "$out/''${f%.typ}.pdf"
+                        done
           '';
 
           dontInstall = true;
@@ -178,6 +182,7 @@
           built=$(nix build --no-link --print-out-paths "path:.#$attr")
           output="$out/$(basename "$place" .typ).pdf"
           install -m 644 "$built/typ/to_print.pdf" "$output"
+          install -m 644 "$built/SIREN.txt" "$out/SIREN.txt"
           echo "$output"
         '';
 

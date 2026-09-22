@@ -9,7 +9,8 @@
 #let ville = "Clermont-Ferrand"
 #let telephone = "04 73 00 00 00"
 #let email = "contact@lesvolcans-immo.fr"
-#let siren = digit-code((3, 3, 3))
+#let siren = sys.inputs.at("siren", default: digit-code((3, 3, 3)))
+#metadata(siren) <siren>
 #let signataire = "Jean Dupont"
 
 #let rule = rgb("B8BDC5")
