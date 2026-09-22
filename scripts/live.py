@@ -8,10 +8,12 @@ already logged in, over the DevTools protocol.
 it, and stops short of the form's own submit button.
 """
 
-import argparse, json, re, subprocess, sys, tempfile, time, unicodedata, urllib.request
+import argparse, base64, json, math, re, subprocess, sys, tempfile, time, unicodedata, urllib.request
 from pathlib import Path
 
 from websockets.sync.client import connect
+
+from nearby import geocode
 
 WORKFLOW = "https://support.google.com/business/workflow/12825603?hl=en"  # "Check your verification status", which gethelp hands over to; `hl` pins the button text
 DETAILS = (
@@ -154,6 +156,46 @@ def placeholder(dir, name, label):
     return out
 
 
+def settled(cdp, sv, timeout=60):
+    """A frame of the panorama once its tiles stop arriving."""
+    quiet = r"""performance.setResourceTimingBufferSize(1e5);
+      const tiles = performance.getEntriesByType('resource').filter(e => e.name.includes('streetviewpixels-pa.googleapis.com'));
+      const splash = [...document.querySelectorAll('div')].some(e => e.getBoundingClientRect().width > 200 && /google|logo/i.test(getComputedStyle(e).backgroundImage));  // the logo laid over a panorama still fading in
+      return !splash && tiles.length > 0 && performance.now() - Math.max(...tiles.map(e => e.responseEnd)) > 2000"""
+    start = time.monotonic()
+    while time.monotonic() < start + timeout:
+        if re.search(r"No Street View imagery|Aucune image Street View", sv.js("return page()")):
+            sys.exit(f"no Street View imagery at {sv.js('return location.href')}")
+        if sv.js("return document.visibilityState") != "visible":
+            browser(cdp, "Target.activateTarget", targetId=sv.target)  # a tab out of sight draws no panorama
+        elif time.monotonic() > start + 3 and sv.js(quiet):
+            frame = base64.b64decode(sv.call("Page.captureScreenshot", format="png")["data"])
+            if sv.js("return document.visibilityState") == "visible":
+                return frame
+        time.sleep(1)
+    sys.exit(f"the panorama at {sv.js('return location.href')} never settled")
+
+
+def street_view(cdp, home, lat, lon, dir):
+    """The panorama nearest the door, looked at from where Google's car stood: towards it, then away from it."""
+    before = {t["targetId"] for t in pages(cdp)}
+    Tab(cdp, home).js(f"window.open('https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat},{lon}', '_blank')")
+    sv = opened_by(cdp, before, "https://www.google.com/maps/")
+    at = sv.until(r"const m = location.href.match(/@(-?[\d.]+),(-?[\d.]+),[\d.]+a/); return m && [+m[1], +m[2]]", "a panorama near the door")
+    p1, p2, dl = math.radians(at[0]), math.radians(lat), math.radians(lon - at[1])
+    towards = round(math.degrees(math.atan2(math.sin(dl) * math.cos(p2), math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl)))) % 360
+    sv.call("Emulation.setDeviceMetricsOverride", width=1600, height=1000, deviceScaleFactor=1, mobile=False)  # the shot is this size whatever the window is
+    shots = []
+    for name, heading in (("towards", towards), ("away", (towards + 180) % 360)):
+        sv.js(rf"location.href = location.href.replace(/,([\d.]+y),(?:[\d.]+h,)?/, ',$1,{heading}h,')")
+        sv.until(f"return document.readyState === 'complete' && location.href.includes(',{heading}h,')", f"heading {heading}")
+        out = Path(dir) / f"street_view_{name}.png"
+        out.write_bytes(settled(cdp, sv))
+        shots.append(out)
+    sv.call("Page.close")
+    return shots
+
+
 def submit(a):
     place = json.loads(subprocess.run(
         ["typst", "query", "--root", ".", "--input", f"place=/{a.place}", "scripts/live.typ", "<live>", "--field", "value", "--one"],
@@ -181,14 +223,14 @@ def submit(a):
     flow.js(f"[...document.querySelectorAll('[role=row]')].filter(r => r.querySelector('input'))[{pick(rows, brand, address['street'])}].querySelector('input').click()")
     flow.click("Continue")
     flow.text("What option best describes your business?")
-    flow.js("[...document.querySelectorAll('input[type=radio]')].find(i => (i.closest('label') || i.labels[0] || i.parentElement.parentElement).textContent.includes('travels to work at customers')).click()")
+    flow.js("[...document.querySelectorAll('input[type=radio]')].find(i => (i.closest('label') || i.labels[0] || i.parentElement.parentElement).textContent.includes('physical location for customers')).click()")
     flow.click("Continue")
     flow.click("Contact us")
     flow.click("contact our support team")
     flow.until("return location.pathname.endsWith('business_verification_awf') && document.querySelector('select[name=other_expanded_reasons_main_condensed]')", "contact form")
 
     flow.choose("select[name=other_expanded_reasons_main_condensed]", "business_profile_is_not_verified")
-    flow.check("business_type_selector--plumber")
+    flow.check("business_type_selector--store")
     flow.choose("select[name=relationship_to_biz]", "owner")
     flow.type("input[name=name]", brand["person"])
     if brand["phone"]:
@@ -210,20 +252,28 @@ def submit(a):
     flow.check("yes_consent1--consent")
 
     docs = tempfile.mkdtemp(prefix="verif_live_")  # the browser reads an attached file when the form is sent, so it outlives this run
-    slots = flow.js("return [...document.querySelectorAll('input[type=file]')].filter(shown).map(e => [e.name, label(e)])")
-    assert slots, "the form shows no file slots"
+    towards, away = street_view(a.cdp, home["targetId"], *geocode(f"{address['street']}, {address['city']}")[:2], docs)
+    slots = dict(flow.js("return [...document.querySelectorAll('input[type=file]')].filter(shown).map(e => [e.name, label(e)])"))
+    files = {
+        "storefront_image_one": towards,
+        "storefront_image_two": away,
+        "storefront_image_8": placeholder(docs, "storefront_image_8", slots["storefront_image_8"]),
+        "proof_upload1": placeholder(docs, "proof_upload1", slots["proof_upload1"]),
+    }
+    if slots.keys() != files.keys():
+        sys.exit(f"the form asks for {sorted(slots)}, and this fills {sorted(files)}")
     root = flow.call("DOM.getDocument")["root"]["nodeId"]
-    for name, text in slots:
+    for name, path in files.items():
         node = flow.call("DOM.querySelector", nodeId=root, selector=f"input[type=file][name={name}]")["nodeId"]
-        flow.call("DOM.setFileInputFiles", nodeId=node, files=[str(placeholder(docs, name, text))])
+        flow.call("DOM.setFileInputFiles", nodeId=node, files=[str(path)])
         assert flow.js(f"return document.querySelector('input[type=file][name={name}]').files.length") == 1, f"{name} took no file"
 
     empty = flow.js("return [...document.querySelectorAll('form input:not([type=radio]):not([type=checkbox]):not([type=hidden]), form textarea, form select')].filter(e => shown(e) && label(e).includes('*') && !(e.type === 'file' ? e.files.length : e.value)).map(label)")
     assert not empty, f"required and still empty: {empty}"
     flow.call("Target.activateTarget", targetId=flow.target)
     print(f"filled for {brand['name']} at {address['street']}, not sent: {flow.js('return location.href')}")
-    for name, text in slots:
-        print(f"  {name}: placeholder ({text})")
+    for name, path in files.items():
+        print(f"  {name}: {path}")
 
 
 def main():
@@ -235,7 +285,7 @@ def main():
     s.add_argument("--account", required=True, help="the Google account that manages the profile")
     s.add_argument("--profile-id", required=True, help="Business Profile ID, from the profile's advanced settings")
     s.add_argument("--brand", help="which of the place's brands, when it has several")
-    s.add_argument("--empty-docs", action="store_true", required=True, help="attach placeholder PDFs to every upload slot")
+    s.add_argument("--empty-docs", action="store_true", required=True, help="attach placeholders in place of the utility bill and the other proof")
     a = p.parse_args()
     if not Path("typ/__main__.typ").exists():
         sys.exit("run from the repository root")

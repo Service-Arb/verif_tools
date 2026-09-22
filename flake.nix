@@ -183,7 +183,7 @@
 
         live = pkgs.writeShellScriptBin "live" ''
           export PATH=${pkgs.typst}/bin:$PATH
-          exec ${pkgs.python3.withPackages (p: [ p.websockets ])}/bin/python3 ${./scripts/live.py} "$@"
+          exec ${pkgs.python3.withPackages (p: [ p.websockets ])}/bin/python3 ${./scripts}/live.py "$@"
         '';
       in
       {
