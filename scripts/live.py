@@ -267,7 +267,7 @@ def submit(a):
     flow.type("input[name=business_nmx_id]", a.profile_id)
     flow.type("textarea[name=describe_issue1]", f"{brand['name']} {brand['descriptor']}, {address['street']}, {address['city']}. {DETAILS}")
     flow.type("input[name=gmb_business_domain]", f"https://{brand['site']}" if brand["site"] else "N/A")
-    register_field = flow.js("return [...document.querySelectorAll('input,textarea')].filter(e => shown(e) && label(e).includes('official government register')).map(e => e.name || '#' + e.id)")
+    register_field = flow.js("return [...document.querySelectorAll('input,textarea')].filter(e => shown(e) && label(e).includes('official government register')).map(e => e.name ? `[name=${e.name}]` : '#' + e.id)")
     assert len(register_field) == 1, f"expected one company-register field, found {register_field}"
     flow.type(register_field[0], siren)
     flow.choose("select[name=country_of_listing]", "FR")
