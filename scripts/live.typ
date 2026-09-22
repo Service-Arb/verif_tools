@@ -3,5 +3,5 @@
 
 #metadata((
   address: address,
-  brands: brands.map(b => (name: b.name, descriptor: b.descriptor, person: b.person, phone: b.phone, site: b.site)),
+  brands: brands.map(b => (name: b.name, descriptor: b.descriptor, person: b.person, email: b.email, phone: b.phone, site: b.site)),
 )) <live>

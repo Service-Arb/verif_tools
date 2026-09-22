@@ -4,7 +4,7 @@ already logged in, over the DevTools protocol.
 
   live submit tmp/<place>.typ --cdp 127.0.0.1:49300 --account <gmail> --profile-id <id> --empty-docs
 
-`submit` walks gethelp -> the verification workflow -> the contact form and fills
+`submit` walks the verification workflow to its contact form and fills
 it, and stops short of the form's own submit button.
 """
 
@@ -13,7 +13,7 @@ from pathlib import Path
 
 from websockets.sync.client import connect
 
-GETHELP = "https://support.google.com/business/gethelp"
+WORKFLOW = "https://support.google.com/business/workflow/12825603?hl=en"  # "Check your verification status", which gethelp hands over to; `hl` pins the button text
 DETAILS = (
     "The only verification method offered to this profile is a video recording, "
     "which we have not been able to complete. We are available for a live video call instead."
@@ -22,10 +22,12 @@ DETAILS = (
 # What the page is asked, prepended to each expression: `shown` is whether the user
 # can see it, and a conditional field hides by hiding an ancestor.
 JS = r"""
+const page = () => document.body ? document.body.innerText : '';  // a navigating tab has no body yet
 const norm = s => s.replace(/\s+/g, ' ').trim();
 const shown = e => e.checkVisibility() || e.parentElement.checkVisibility();
 const byText = t => [...document.querySelectorAll('button,[role=button],[role=option],a')]
   .filter(e => shown(e) && (norm(e.textContent) === t || norm(e.textContent).endsWith(t)));
+const flat = e => { const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT), out = []; while (w.nextNode()) out.push(w.currentNode.data); return norm(out.join(' ')); };
 const label = e => norm((e.labels && e.labels[0] && e.labels[0].textContent) || e.getAttribute('aria-label') || '');
 """
 
@@ -60,7 +62,7 @@ class Tab:
         sys.exit(f"no {what} after {timeout}s on {self.js('return location.href')}")
 
     def text(self, t):
-        return self.until(f"return document.body.innerText.includes({json.dumps(t)})", repr(t))
+        return self.until(f"return page().includes({json.dumps(t)})", repr(t))
 
     def click(self, t):
         self.until(f"const m = byText({json.dumps(t)}); if (!m.length) return false; m.at(-1).click(); return true", f"button {t!r}")
@@ -121,7 +123,9 @@ def opened_by(cdp, before, prefix, timeout=20):
         new = [t for t in pages(cdp) if t["targetId"] not in before and t["url"].startswith(prefix)]
         if new:
             assert len(new) == 1, f"{len(new)} new tabs at {prefix}"
-            return Tab(cdp, new[0]["targetId"])
+            tab = Tab(cdp, new[0]["targetId"])
+            tab.until(f"return document.readyState === 'complete' && location.href.startsWith({json.dumps(prefix)})", f"{prefix} loaded")
+            return tab
         time.sleep(0.5)
     sys.exit(f"no tab opened at {prefix}")
 
@@ -162,34 +166,18 @@ def submit(a):
 
     home = profile_of(a.cdp, a.account)
     before = {t["targetId"] for t in pages(a.cdp)}
-    Tab(a.cdp, home["targetId"]).js(f"window.open({json.dumps(GETHELP)}, '_blank')")
-    help = opened_by(a.cdp, before, GETHELP)
+    Tab(a.cdp, home["targetId"]).js(f"window.open({json.dumps(WORKFLOW)}, '_blank')")
+    flow = opened_by(a.cdp, before, WORKFLOW)
 
-    help.until("return document.querySelectorAll('[role=option] .scSharedGmblistingselectorname').length", "business picker")
-    listings = help.js("return [...document.querySelectorAll('[role=option]')].filter(o => o.querySelector('.scSharedGmblistingselectorname')).map(o => norm(o.textContent))")
-    i = pick(listings, brand, address["street"])
-    help.js(f"""document.querySelector('[role=listbox]').click();
-      [...document.querySelectorAll('[role=option]')].filter(o => o.querySelector('.scSharedGmblistingselectorname'))[{i}].click()""")
-    help.type("main input[type=text]", "Verification")
-    help.click("Next")
-    help.click("Can't make or upload verification video")
-    help.click("Next step")
-    help.text("People with similar issues")
-    help.click("Next step")
-    before = {t["targetId"] for t in pages(a.cdp)}
-    help.click("Get help with verification")
-    flow = opened_by(a.cdp, before, "https://support.google.com/business/workflow/")
-    help.call("Page.close")
-
-    stage = flow.until("const t = document.body.innerText; return t.includes('Start again') ? 'resume' : t.includes('Confirm email') && 'fresh'", "verification workflow")
+    stage = flow.until("const t = page(); return t.includes('Start over') ? 'resume' : t.includes('Confirm email') && 'fresh'", "verification workflow")
     if stage == "resume":
-        flow.click("Start again")
+        flow.click("Start over")
     flow.text("Confirm email")
-    asked = re.search(r"Is (\S+@\S+) the email address", flow.js("return document.body.innerText"))[1]
+    asked = re.search(r"Is (\S+@\S+) the email address", flow.js("return page()"))[1]
     if asked != a.account:
         sys.exit(f"the workflow is signed in as {asked}, not {a.account}")
     flow.click("Confirm")
-    rows = flow.until("const r = [...document.querySelectorAll('[role=row]')].filter(r => r.querySelector('input')).map(r => norm(r.textContent)); return r.length && r", "business table")
+    rows = flow.until("const r = [...document.querySelectorAll('[role=row]')].filter(r => r.querySelector('input')).map(flat); return r.length && r", "business table")
     flow.js(f"[...document.querySelectorAll('[role=row]')].filter(r => r.querySelector('input'))[{pick(rows, brand, address['street'])}].querySelector('input').click()")
     flow.click("Continue")
     flow.text("What option best describes your business?")
@@ -210,6 +198,8 @@ def submit(a):
         flow.type("input[type=tel]", "0" + national[1])
         flow.check("phone_phone-type-mobile" if national[1][0] in "67" else "phone_phone-type-landline")
     flow.type("input[name=customer_email_GMB_copy]", a.account)
+    if flow.js("return shown(document.querySelector('input[name=company_domain_field_updated1]'))"):  # asked of a Gmail account
+        flow.type("input[name=company_domain_field_updated1]", brand["email"])
     flow.type("input[name=business_nmx_id]", a.profile_id)
     flow.type("textarea[name=describe_issue1]", f"{brand['name']} {brand['descriptor']}, {address['street']}, {address['city']}. {DETAILS}")
     flow.type("input[name=gmb_business_domain]", f"https://{brand['site']}" if brand["site"] else "N/A")
@@ -231,7 +221,7 @@ def submit(a):
     empty = flow.js("return [...document.querySelectorAll('form input:not([type=radio]):not([type=checkbox]):not([type=hidden]), form textarea, form select')].filter(e => shown(e) && label(e).includes('*') && !(e.type === 'file' ? e.files.length : e.value)).map(label)")
     assert not empty, f"required and still empty: {empty}"
     flow.call("Target.activateTarget", targetId=flow.target)
-    print(f"filled for {listings[i]}, not sent: {flow.js('return location.href')}")
+    print(f"filled for {brand['name']} at {address['street']}, not sent: {flow.js('return location.href')}")
     for name, text in slots:
         print(f"  {name}: placeholder ({text})")
 
