@@ -180,6 +180,11 @@
           install -m 644 "$built/typ/to_print.pdf" "$output"
           echo "$output"
         '';
+
+        live = pkgs.writeShellScriptBin "live" ''
+          export PATH=${pkgs.typst}/bin:$PATH
+          exec ${pkgs.python3.withPackages (p: [ p.websockets ])}/bin/python3 ${./scripts/live.py} "$@"
+        '';
       in
       {
         apps.help = {
@@ -189,10 +194,16 @@
             nix build .#typ               The signs no door decides, in every language
             nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
             nix run . -- <place.typ>      The same to_print.pdf, in your downloads or -o DIR
+            nix run .#live -- submit -h   Fill a place's verification form in a logged-in Chrome
             nix flake show path:.         Which doors there are to build
             nix develop                   Enter the Typst development shell
             EOF
           ''}/bin/help";
+        };
+
+        apps.live = {
+          type = "app";
+          program = "${live}/bin/live";
         };
 
         apps.default = {
