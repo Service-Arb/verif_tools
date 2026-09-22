@@ -187,7 +187,7 @@ suffix goes there (`"CLO\nCoffee Co."`). No suffix, no `\n`.
 nix run . -- tmp/<place>.typ
 ```
 
-The command writes one PDF by default to `~/Downloads/verif_prints/<place>.pdf`.
+The command writes the PDF to `~/Downloads/verif_prints/<place>.pdf` and writes the generated SIREN to `~/Downloads/verif_prints/SIREN.txt`. Keep both files together: `/submit-live` reads the matching PDF and this SIREN file from that directory.
 Pass `-o DIR` only when a different output folder is required. The PDF contains
 one shared set of place-derived sheets, followed by each brand's posters and
 cards.

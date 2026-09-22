@@ -159,6 +159,17 @@ def pick(listings, brand, street):
     return hits[0]
 
 
+def prepared_docs(place, directory):
+    directory = Path(directory).expanduser()
+    pack = directory / f"{Path(place).stem}.pdf"
+    siren = directory / "SIREN.txt"
+    missing = [str(path) for path in (pack, siren) if not path.is_file()]
+    if missing:
+        sys.exit("/prepare-verif output is missing: " + ", ".join(missing) + "; run it first or pass --docs DIR")
+    return pack, siren.read_text().strip()
+
+
+
 def placeholder(dir, name, label):
     out = Path(dir) / f"{name}.pdf"
     src = f'#set page(paper: "a4")\n#align(center + horizon, text(28pt)[PLACEHOLDER] + parbreak() + text(14pt, {json.dumps(label, ensure_ascii=False)}))'
@@ -239,6 +250,7 @@ def submit(a):
     flow.click("contact our support team")
     flow.until("return location.pathname.endsWith('business_verification_awf') && document.querySelector('select[name=other_expanded_reasons_main_condensed]')", "contact form")
 
+    pack, siren = prepared_docs(a.place, a.docs)
     flow.choose("select[name=other_expanded_reasons_main_condensed]", "business_profile_is_not_verified")
     flow.check("business_type_selector--store")
     flow.choose("select[name=relationship_to_biz]", "owner")
@@ -255,7 +267,11 @@ def submit(a):
     flow.type("input[name=business_nmx_id]", a.profile_id)
     flow.type("textarea[name=describe_issue1]", f"{brand['name']} {brand['descriptor']}, {address['street']}, {address['city']}. {DETAILS}")
     flow.type("input[name=gmb_business_domain]", f"https://{brand['site']}" if brand["site"] else "N/A")
+    register_field = flow.js("return [...document.querySelectorAll('input,textarea')].filter(e => shown(e) && label(e).includes('official government register')).map(e => e.name || '#' + e.id)")
+    assert len(register_field) == 1, f"expected one company-register field, found {register_field}"
+    flow.type(register_field[0], siren)
     flow.choose("select[name=country_of_listing]", "FR")
+
     flow.check("verification_issue--cannot_complete_verif")
     flow.type("input[name=verification_method_unsuitable]", DETAILS)
     flow.check("ODVV_consent--yes")
@@ -267,8 +283,8 @@ def submit(a):
     files = {
         "storefront_image_one": towards,
         "storefront_image_two": away,
-        "storefront_image_8": placeholder(docs, "storefront_image_8", slots["storefront_image_8"]),
-        "proof_upload1": placeholder(docs, "proof_upload1", slots["proof_upload1"]),
+        "storefront_image_8": pack,
+        "proof_upload1": pack,
     }
     if slots.keys() != files.keys():
         sys.exit(f"the form asks for {sorted(slots)}, and this fills {sorted(files)}")
@@ -294,6 +310,7 @@ def main():
     s.add_argument("--cdp", required=True, help="host:port of a Chrome started with --remote-debugging-port")
     s.add_argument("--account", required=True, help="the Google account that manages the profile")
     s.add_argument("--profile-id", required=True, help="Business Profile ID, from the profile's advanced settings")
+    s.add_argument("--docs", default="~/Downloads/verif_prints", help="directory containing /prepare-verif's place PDF and SIREN.txt")
     s.add_argument("--brand", help="which of the place's brands, when it has several")
     a = p.parse_args()
     if not Path("typ/__main__.typ").exists():
