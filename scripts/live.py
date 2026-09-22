@@ -2,13 +2,23 @@
 """What a place says, carried into Google's own pages through a Chrome that is
 already logged in, over the DevTools protocol.
 
-  live submit tmp/<place>.typ --cdp 127.0.0.1:49300 --account <gmail> --profile-id <id> --empty-docs
+  live submit tmp/<place>.typ --cdp 127.0.0.1:49300 --account <gmail> --profile-id <id>
 
 `submit` walks the verification workflow to its contact form and fills
 it, and stops short of the form's own submit button.
 """
 
-import argparse, base64, json, math, re, subprocess, sys, tempfile, time, unicodedata, urllib.request
+import argparse
+import base64
+import json
+import math
+import re
+import subprocess
+import sys
+import tempfile
+import time
+import unicodedata
+import urllib.request
 from pathlib import Path
 
 from websockets.sync.client import connect
@@ -285,7 +295,6 @@ def main():
     s.add_argument("--account", required=True, help="the Google account that manages the profile")
     s.add_argument("--profile-id", required=True, help="Business Profile ID, from the profile's advanced settings")
     s.add_argument("--brand", help="which of the place's brands, when it has several")
-    s.add_argument("--empty-docs", action="store_true", required=True, help="attach placeholders in place of the utility bill and the other proof")
     a = p.parse_args()
     if not Path("typ/__main__.typ").exists():
         sys.exit("run from the repository root")
