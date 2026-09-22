@@ -33,8 +33,6 @@
 // Digits in the shape the code is written in: `(3, 3, 3)` reads back as
 // "123 456 789". Typst has no tuple, so the shape is an array. The last digit
 // checks the rest, as SIREN, IBAN and card numbers all do.
-// ponytail: shape and checksum, nothing behind them — carry the real number if
-// the document has to survive a lookup.
 #let digit-code(groups, seed: 0, luhn: true) = {
   assert(groups.len() > 0, message: "a code of no groups")
   for n in groups {
