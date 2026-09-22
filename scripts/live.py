@@ -150,9 +150,9 @@ def pick(listings, brand, street):
 
 
 def placeholder(dir, name, label):
-    out = Path(dir) / f"{name}.png"
+    out = Path(dir) / f"{name}.pdf"
     src = f'#set page(paper: "a4")\n#align(center + horizon, text(28pt)[PLACEHOLDER] + parbreak() + text(14pt, {json.dumps(label, ensure_ascii=False)}))'
-    subprocess.run(["typst", "compile", "--format", "png", "-", str(out)], input=src.encode(), check=True)
+    subprocess.run(["typst", "compile", "-", str(out)], input=src.encode(), check=True)
     return out
 
 
