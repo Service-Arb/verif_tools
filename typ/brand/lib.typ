@@ -82,9 +82,9 @@
   align(center + horizon, block(width: 100%, {
     align(center, fit(200mm, 90pt, sz => _lockup(brand, sz, _ink)))
     v(16mm)
-    align(center, fit(200mm, 20pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
+    align(center, fit(200mm, 22pt, sz => text(size: sz, weight: "bold", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
     let reached = ()
-    if brand.phone != none { reached.push(align(center, fit(190mm, 66pt, sz => text(size: sz, weight: "bold", brand.phone)))) }
+    if brand.phone != none { reached.push(align(center, fit(190mm, 58pt, sz => text(size: sz, weight: "bold", brand.phone)))) }
     if brand.site != none { reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site))) }
     if reached.len() > 0 {
       v(20mm)
