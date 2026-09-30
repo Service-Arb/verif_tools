@@ -21,6 +21,7 @@ import unicodedata
 import urllib.request
 from pathlib import Path
 
+from pypdf import PdfReader
 from websockets.sync.client import connect
 
 from nearby import geocode
@@ -168,16 +169,14 @@ def pick(listings, brand, street):
 
 
 def prepared_docs(place, directory):
-    directory = Path(directory).expanduser()
-    pack = directory / f"{Path(place).stem}.pdf"
-    siren = directory / "SIREN.txt"
-    missing = [str(path) for path in (pack, siren) if not path.is_file()]
-    if missing:
-        sys.exit("/prepare-verif output is missing: " + ", ".join(missing) + "; run it first or pass --docs DIR")
-    siren = siren.read_text().strip()
-    if not re.fullmatch(r"\d{3} \d{3} \d{3}", siren):
-        sys.exit(f"{directory / 'SIREN.txt'} holds {siren!r}, not a SIREN; rerun /prepare-verif")
-    return pack, siren
+    pack = Path(directory).expanduser() / f"{Path(place).stem}.pdf"
+    if not pack.is_file():
+        sys.exit(f"{pack} is missing; run /prepare-verif first or pass --docs DIR")
+    text = "".join(page.extract_text() for page in PdfReader(pack).pages)
+    sirens = set(re.findall(r"SIREN\W*(\d{3} \d{3} \d{3})", text))
+    if len(sirens) != 1:
+        sys.exit(f"{pack} carries SIRENs {sirens}, not exactly one; rerun /prepare-verif")
+    return pack, sirens.pop()
 
 
 
@@ -321,7 +320,7 @@ def main():
     s = sub.add_parser("submit", help="fill the verification contact form for a place, up to its submit button")
     s.add_argument("place", help="tmp/<place>.typ, examples/<place>.typ, or words of a tmp/ place's name")
     s.add_argument("--cdp", required=True, help="host:port of a Chrome started with --remote-debugging-port")
-    s.add_argument("--docs", default="~/Downloads/verif_prints", help="directory containing /prepare-verif's place PDF and SIREN.txt")
+    s.add_argument("--docs", default="~/Downloads/verif_prints", help="directory containing /prepare-verif's place PDF")
     s.add_argument("--brand", help="which of the place's brands, when it has several")
     a = p.parse_args()
     if not Path("typ/__main__.typ").exists():

@@ -9,7 +9,7 @@ description: Fill Google's Business Profile verification contact form for a plac
 nix run .#live -- submit <place> --cdp 127.0.0.1:$CHROME_DEBUG_PORT
 ```
 
-`/prepare-verif` must have been run first: the command reads `<place>.pdf` and `SIREN.txt` from `--docs` (default `~/Downloads/verif_prints`).
+`/prepare-verif` must have been run first: the command reads `<place>.pdf`, and the SIREN printed on it, from `--docs` (default `~/Downloads/verif_prints`).
 
 Never press the form's Submit yourself.
 

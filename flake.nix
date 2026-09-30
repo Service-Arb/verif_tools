@@ -63,7 +63,7 @@
           inherit name;
           src = ./.;
 
-          nativeBuildInputs = [ pkgs.typst pkgs.jq one-sided ];
+          nativeBuildInputs = [ pkgs.typst one-sided ];
 
           buildPhase = ''
                         : > edges
@@ -92,15 +92,11 @@
                         # was first built on; `__impure = true` if it has to follow the day
                         unset SOURCE_DATE_EPOCH
 
-                        ${pkgs.lib.optionalString (place != null) ''siren=$(unset SOURCE_DATE_EPOCH; typst query --root . --ignore-system-fonts --font-path ${pkgs.liberation_ttf}/share/fonts/truetype typ/siren.typ '<siren>' --one --field value | jq -r .)
-                        mkdir -p "$out"
-                        printf '%s\n' "$siren" > "$out/SIREN.txt"
-
-            ''}            for f in $(find typ -name '*.typ'); do
+            for f in $(find typ -name '*.typ'); do
                           if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
                           ${pkgs.lib.optionalString (place == null) ''if grep -qxF "$(realpath -m "$f")" placed; then continue; fi''}
                           mkdir -p "$out/$(dirname "$f")"
-                          typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place} --input siren=\"$siren\""} \
+                          typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
                             --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
                             "$f" "$out/''${f%.typ}.pdf"
                           one-sided "$out/''${f%.typ}.pdf"
@@ -182,13 +178,12 @@
           built=$(nix build --no-link --print-out-paths "path:.#$attr")
           output="$out/$(basename "$place" .typ).pdf"
           install -m 644 "$built/typ/to_print.pdf" "$output"
-          install -m 644 "$built/SIREN.txt" "$out/SIREN.txt"
           echo "$output"
         '';
 
         live = pkgs.writeShellScriptBin "live" ''
           export PATH=${pkgs.typst}/bin:$PATH
-          exec ${pkgs.python3.withPackages (p: [ p.websockets ])}/bin/python3 ${./scripts}/live.py "$@"
+          exec ${pkgs.python3.withPackages (p: [ p.websockets p.pypdf ])}/bin/python3 ${./scripts}/live.py "$@"
         '';
       in
       {
