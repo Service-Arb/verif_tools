@@ -12,8 +12,8 @@ nix build "path:.#<place>" # result/typ/signs/{street,nearby}.pdf
 ## The plate
 
 `street.pdf` is the whole plate, drawn at its real size and windowed onto as many
-A4 sheets as it spans. Print, cut the white strip off each sheet's trailing edge,
-lay each over the next, glue.
+A4 sheets as it spans. Only the plate is inked: print, cut each sheet along its
+blue, lay each over the next, glue, and the result is exactly the plate's width.
 
 Two stages, in this order and never mixed:
 
@@ -34,7 +34,7 @@ stage 2 — that same drawing, windowed onto paper
               ◁ 20mm ▷ overlap: same content as the sheet above it,
                        so the letter strokes are the alignment guide
                         ├── sheet 2 ──────┤
-                                  plate's right end ──┤ ticks mark it
+                                  plate's right end ──┤ blue stops, white after
 ```
 
 The plate's height runs along the paper's long side, so every sheet is portrait
@@ -47,7 +47,7 @@ white edge.
 | `paper` | 210mm, A4's short side |
 | `bleed` `b` | 0.6mm, what the printer leaves white at a paper edge |
 | `overlap` | 20mm, how much of the sheet below the one above covers |
-| trimmed width | `paper − b` — cut along the blue/white boundary, no tick needed; wandering *inward* is free, the sheet below has that content |
+| trimmed width | `paper − b` — cut along the blue/white boundary; wandering *inward* is free, the sheet below has that content. The last sheet's blue stops at the plate's end, so the glued strip is `W` |
 | advance `a` | `paper − b − overlap` = 189.4mm |
 | sheet `k` origin | `pₖ = −b + k·a`, so the plate's left end sits at sheet 0's ink boundary |
 | sheet count | `n = max(1, 1 + ceil((W − paper + 2b) / a))` |
@@ -73,7 +73,7 @@ breaks across lines.
 
 ## The fallback
 
-`background.pdf` is the plate's blue, edge to edge, and `alphabet.pdf` is A–Z at
+`background.pdf` is the blank plate, windowed onto sheets the same way, and `alphabet.pdf` is A–Z at
 the plate's own cap height, white with a hairline outline to cut along. Tape the
 blue together, cut the letters out, glue them on. An hour of scissors, for when
 the plate cannot be printed whole.

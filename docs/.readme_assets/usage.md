@@ -4,9 +4,8 @@ Some sheets are the same for all addresses. Build them with no place file:
 nix build .#typ
 ```
 
-This makes one PDF for each: the signs in `result/typ/reusable/`, and the plate
-colour in `result/typ/signs/`. A sign has one PDF for each language. Print the
-one you want.
+This makes one PDF for each: the signs in `result/typ/reusable/`. A sign has one
+PDF for each language. Print the one you want.
 
 Each business is a file in `examples/brands/`. It holds the name, the contact and
 the two colours. One business can have many addresses, and they all read this
@@ -38,8 +37,9 @@ printer dialogs do not obey. Set these in the dialog:
 With the `lp` command, use `-o sides=one-sided -o fit-to-page=false`.
 
 The street plate is on the first sheets. It is wider than one sheet, so it uses
-more than one. Cut the white edge off each of these sheets. Then put each sheet
-on the next sheet and glue it. The letters continue across the join.
+more than one. Cut each of these sheets along the edge of its blue. Then put each
+sheet on the next sheet and glue it. The letters continue across the join, and
+the blue is as wide as the plate.
 
 To get that file in your download directory, use this:
 

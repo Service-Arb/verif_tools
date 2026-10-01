@@ -99,19 +99,16 @@
   best
 }
 
-#let _plate(name, width, height) = context {
+#let _plate(name, width, height) = context block(width: width, height: height, fill: blue, if name != none {
   let l = layout(name, width, height)
-  block(width: width, height: height, fill: blue, {
-    set align(center + horizon)
-    set par(leading: _leading * l.cap, spacing: 0pt)
-    l.lines.map(line => _glyphs(l.size, line)).join(linebreak())
-  })
-}
+  set align(center + horizon)
+  set par(leading: _leading * l.cap, spacing: 0pt)
+  l.lines.map(line => _glyphs(l.size, line)).join(linebreak())
+})
 
-#let _mark(stroke) = line(angle: 90deg, length: 4mm, stroke: stroke)
-
-// The same drawing windowed onto as many A4 sheets as it spans. Cut the white
-// strip off each sheet's trailing edge, lay each over the next, glue.
+// The same drawing windowed onto as many A4 sheets as it spans; `none` draws the
+// blank alone. Only the plate is inked, so trimming every sheet to its blue and
+// gluing each over the next leaves exactly `width`.
 #let sheets(name, width: none, height: none) = {
   assert(width != none and height != none, message: "a plate needs the blank it is cut from")
   let advance = paper - bleed - overlap
@@ -126,18 +123,12 @@
       page(
         paper: "a4",
         margin: 0pt,
-        fill: blue,
         block(width: 100%, height: 100%, clip: true, {
           place(top + left, dx: -origin, dy: -(height - 297mm) / 2, drawn)
           // where the sheet above lands, so it ends up underneath it
           if k > 0 {
             place(top + left, dx: overlap, line(angle: 90deg, length: 100%, stroke: hair))
             place(top + left, dx: overlap + 1.5mm, dy: 1.5mm, _glyphs(8pt, str(k + 1)))
-          }
-          if k == n - 1 {
-            let right = width - origin
-            place(top + left, dx: right, dy: bleed, _mark(hair))
-            place(bottom + left, dx: right, dy: -bleed - 4mm, _mark(hair))
           }
         }),
       ),

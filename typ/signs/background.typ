@@ -1,4 +1,4 @@
-#import "plate.typ": blue
-#set page(paper: "a4", margin: 0pt, fill: blue)
-
-#box()
+#import "../__main__.typ": street_plate
+#import "../utils.typ": pack
+#import "plate.typ": sheets
+#pack(sheets(none, ..street_plate))

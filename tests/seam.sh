@@ -32,7 +32,7 @@ for place in "${places[@]}"; do
     --format png --ppi "$ppi" typ/signs/street.typ "$dir/p{p}.png"
 
   python3 - "$dir" "$paper_mm" "$bleed_mm" "$overlap_mm" "$ppi" "$tol_px" "$place" <<'PY'
-import glob, subprocess, sys
+import glob, re, subprocess, sys
 
 out, place = sys.argv[1], sys.argv[7]
 paper, bleed, overlap, ppi, tol = map(float, sys.argv[2:7])
@@ -53,13 +53,21 @@ for page in pages:
         d = f.read()
     sheets.append((page, w, h, d))
 
-    at = lambda x, y: d[(y * w + x) * 3 : (y * w + x) * 3 + 3]
-    for cx, cy in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)):
-        r, g, b = at(cx, cy)
-        # #222D5A, the plate blue, edge to edge — a white corner is a page that
-        # did not take the fill
-        if abs(r - 0x22) > 24 or abs(g - 0x2D) > 24 or abs(b - 0x5A) > 24:
-            fail.append(f"{page}: corner {cx},{cy} is #{r:02x}{g:02x}{b:02x}, not the plate blue")
+
+def blue(sheet, x, y):
+    page, w, h, d = sheet
+    r, g, b = d[(y * w + x) * 3 : (y * w + x) * 3 + 3]
+    return abs(r - 0x22) <= 24 and abs(g - 0x2D) <= 24 and abs(b - 0x5A) <= 24 # #222D5A
+
+# Trimmed to its blue and glued, the sheets have to come out exactly as wide as the
+# plate: where the last one's blue stops is where the plate ends.
+width = float(re.search(r"street_plate = \(width: ([\d.]+)cm", open("." + place).read()).group(1)) * 10
+last = sheets[-1]
+y = px(5) # above the letters
+edge = 1 + max(x for x in range(last[1]) if blue(last, x, y))
+got = -bleed + (len(sheets) - 1) * (paper - bleed - overlap) + edge / ppi * 25.4
+if abs(got - width) > 25.4 / ppi * tol:
+    fail.append(f"the blue trims to {got:.1f}mm, the plate is {width:.0f}mm")
 
 # A run of white in a column is a letter stroke crossing it. The two columns hold
 # the same plate coordinate, so they hold the same strokes — read 1mm inside the
