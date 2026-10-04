@@ -28,7 +28,7 @@
     + (
       descriptor: "Plombier Chauffagiste - Clermont-Ferrand",
       phone: "+33 7 57 69 12 38",
-      print_card_n: 2, // one card is two sides, so this many of each
+      print_card_n: 2, // one card is two sides, so this many of each; one names no door
       print_sheet_n: 4,
     )
 )

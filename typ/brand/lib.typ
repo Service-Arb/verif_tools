@@ -36,17 +36,25 @@
   _mark(brand, size * 1.25, brand.accent), _name(brand, size, fill),
 )
 
-#let _front(brand) = box(width: _card-w, height: _card-h, fill: brand.primary, {
+// `generic` names no door: the brand's own lines stand where the descriptor and
+// the address would.
+#let _front(brand, generic) = box(width: _card-w, height: _card-h, fill: brand.primary, {
   set text(font: "Liberation Sans")
+  let row(s, fill) = align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: fill, upper(s))))
+  let lines = if generic {
+    (brand.trade, brand.promise).zip((brand.accent, white)).filter(((s, _)) => s != none).map(((s, fill)) => row(tr(s, lang), fill))
+  } else {
+    (row(brand.descriptor, brand.accent),)
+  }
   place(center + horizon, stack(
     dir: ttb,
     spacing: 7mm,
     align(center, fit(58mm, 22pt, sz => _lockup(brand, sz, white))),
-    align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: brand.accent, upper(brand.descriptor)))),
+    stack(dir: ttb, spacing: 3mm, ..lines),
   ))
 })
 
-#let _back(brand) = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
+#let _back(brand, generic) = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
   set text(font: "Liberation Sans", fill: _ink)
   place(top + left, rect(width: _card-w, height: 2mm, fill: brand.accent))
   place(top + left, block(inset: (x: 7mm, top: 5mm), {
@@ -69,11 +77,13 @@
         .flatten()
     )
   }))
-  place(bottom + left, dx: 7mm, dy: -8.5mm, line(length: _card-w - 14mm, stroke: 0.4pt + _hairline))
-  place(bottom + left, dx: 7mm, dy: -6mm, text(size: 6.5pt, fill: _ink-soft, address.street + "  ·  " + address.city))
+  if not generic {
+    place(bottom + left, dx: 7mm, dy: -8.5mm, line(length: _card-w - 14mm, stroke: 0.4pt + _hairline))
+    place(bottom + left, dx: 7mm, dy: -6mm, text(size: 6.5pt, fill: _ink-soft, address.street + "  ·  " + address.city))
+  }
 })
 
-#let cards(brand, n) = range(n).map(_ => unit(box(_front(brand) + _back(brand))))
+#let cards(brand, n, generic: false) = range(n).map(_ => unit(box(_front(brand, generic) + _back(brand, generic))))
 
 #let poster(brand) = unit(full_page: true, {
   set page(paper: "a4", flipped: true, margin: 18mm, fill: white)

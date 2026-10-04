@@ -14,6 +14,8 @@
   name_segments: none,
   phone: none,
   site: none,
+  trade: none,
+  promise: none,
 )
 #let brands = _brands.map(brand => _brand_defaults + brand)
 
@@ -26,7 +28,7 @@
 #for brand in brands {
   let keys = brand.keys().sorted()
   assert(
-    ("accent", "descriptor", "email", "logo", "name", "name_segments", "person", "phone", "primary", "print_card_n", "print_sheet_n", "site").all(key => key in keys),
+    ("accent", "descriptor", "email", "logo", "name", "name_segments", "person", "phone", "primary", "print_card_n", "print_sheet_n", "promise", "site", "trade").all(key => key in keys),
     message: "brand is missing a required field: " + repr(keys),
   )
   for k in ("primary", "accent") { assert(type(brand.at(k)) == color, message: "brand." + k + " is " + repr(brand.at(k)) + ", not a colour") }
@@ -37,6 +39,9 @@
       brand.at(k) == none or type(brand.at(k)) == str,
       message: "brand." + k + " is " + repr(brand.at(k)) + "; leave it out rather than invent one",
     )
+  }
+  for k in ("trade", "promise") {
+    assert(brand.at(k) == none or type(brand.at(k)) == dictionary, message: "brand." + k + " is " + repr(brand.at(k)) + ", not text keyed by language")
   }
   assert(brand.print_card_n > 0, message: "no business cards asked for")
   assert(brand.print_sheet_n > 0, message: "no door sheets asked for")

@@ -5,7 +5,8 @@
 // `logo` is the mark set beside the name; leave it out and the mark is `name`'s
 // first letter, which says nothing about the trade. `primary` fills the card's
 // front and carries white type, so it has to be dark; leave it and `accent` out
-// and every door takes the pair `typ/__main__.typ` names.
+// and every door takes the pair `typ/__main__.typ` names. `trade` and `promise`,
+// per language, are what the card says when it names no door.
 
 #let brand = (
   name: "Aquafix",
@@ -14,4 +15,7 @@
   site: "aquafix.top",
   // a drop in a hex; `currentColor`, so it comes out in `accent` wherever it lands
   logo: "/assets/logos/aquafix.svg",
+  // ../aquafix/assets/card.toml
+  trade: (fr: "Plomberie bien faite", en: "Plumbing done right"),
+  promise: (fr: "Prix fixe. Réparé aujourd’hui.", en: "Fixed price. Fixed today."),
 )

@@ -22,7 +22,8 @@
   brands
     .map(brand => (
       ..range(brand.print_sheet_n).map(_ => poster(brand)),
-      ..cards(brand, brand.print_card_n),
+      ..cards(brand, brand.print_card_n - 1),
+      ..cards(brand, 1, generic: true),
     ))
     .flatten()
 )
