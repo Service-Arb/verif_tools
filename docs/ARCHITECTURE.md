@@ -65,3 +65,5 @@ flowchart LR
 ```
 
 `.claude/skills/prepare-verif` walks that left to right.
+
+`mock_payments_site/` is a separate static site with nothing in common with the sheets; see its README.

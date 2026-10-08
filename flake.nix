@@ -185,8 +185,30 @@
           export PATH=${pkgs.typst}/bin:$PATH
           exec ${pkgs.python3.withPackages (p: [ p.websockets p.pypdf ])}/bin/python3 ${./scripts}/live.py "$@"
         '';
+
+        # serves a temp dir so nothing generated lands in the repo; our --out is last, and argparse keeps the last
+        payments-site = pkgs.writeShellApplication {
+          name = "payments-site";
+          runtimeInputs = [ pkgs.python3 pkgs.cloudflared ];
+          text = ''
+            dir=$(mktemp -d)
+            trap 'kill $(jobs -p) 2>/dev/null || true; rm -rf "$dir"' EXIT
+            cp ${./mock_payments_site}/{index.html,app.js,i18n.js,style.css} "$dir"
+            python3 ${./mock_payments_site/generate.py} "$@" --out "$dir/transactions.json"
+            port=''${PORT:-59130}
+            echo "http://127.0.0.1:$port  https://dev.aquafix.top"
+            python3 -m http.server "$port" --bind 127.0.0.1 -d "$dir" &
+            cloudflared tunnel --no-autoupdate --loglevel warn run --url "http://127.0.0.1:$port" 7e6a7975-e1c4-42b4-b69f-3a400b7fc679 & # "aquafix-dev", Ev Invest account; credentials: ~/.cloudflared/<id>.json
+            wait -n
+          '';
+        };
       in
       {
+        apps.payments-site = {
+          type = "app";
+          program = "${payments-site}/bin/payments-site";
+        };
+
         apps.help = {
           type = "app";
           program = "${pkgs.writeShellScriptBin "help" ''
@@ -195,6 +217,8 @@
             nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
             nix run . -- <place.typ>      The same to_print.pdf, in your downloads or -o DIR
             nix run .#live -- submit -h   Fill a place's verification form in a logged-in Chrome
+            nix run .#payments-site -- KIND NAME [--lang en|fr] [--months N] [--seed N]
+                                          Mock Stripe dashboard on :59130 and https://dev.aquafix.top
             nix flake show path:.         Which doors there are to build
             nix develop                   Enter the Typst development shell
             EOF
