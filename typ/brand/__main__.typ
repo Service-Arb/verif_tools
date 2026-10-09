@@ -5,4 +5,4 @@
 
 #let brand = brands.first()
 #let door = (descriptor: brand.descriptor, street: address.street, city: address.city)
-#pack((poster(brand, lang, door: door),) + cards(brand, 1, lang, door: door))
+#pack((poster(brand, lang, false, door: door),) + cards(brand, 1, lang, door: door))

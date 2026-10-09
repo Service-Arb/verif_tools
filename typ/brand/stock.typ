@@ -6,4 +6,4 @@
 
 #let lang = sys.inputs.lang
 #let brand = resolve(_brand)
-#pack((poster(brand, lang),) + cards(brand, 5, lang))
+#pack((poster(brand, lang, false), poster(brand, lang, true)) + cards(brand, 5, lang))

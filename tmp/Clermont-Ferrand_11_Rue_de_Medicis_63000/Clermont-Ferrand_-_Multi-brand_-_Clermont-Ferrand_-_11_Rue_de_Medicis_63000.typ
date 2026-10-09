@@ -17,30 +17,28 @@
       descriptor: "Plombier Chauffagiste - Clermont-Ferrand",
       phone: none,
       print_card_n: 2,
-      print_sheet_n: 4,
     ),
   serrunova
     + (
       descriptor: "Serrurier - Clermont-Ferrand",
       phone: none,
       print_card_n: 2,
-      print_sheet_n: 4,
     ),
   aerotherm
     + (
       descriptor: "Climatisation & Chauffage - Clermont-Ferrand",
       phone: none,
       print_card_n: 2,
-      print_sheet_n: 4,
     ),
   toitvolcan
     + (
       descriptor: "Couvreur - Clermont-Ferrand",
       phone: none,
       print_card_n: 2,
-      print_sheet_n: 4,
     ),
 )
+#let directions = ()
+
 #let nearby = (
   other_businesses: (
     "Le Doyenné de l'Oradou\nÉquipement social",

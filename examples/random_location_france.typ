@@ -18,15 +18,17 @@
 // tall the letters to cut out come off the paper; the width records the blank.
 #let street_plate = (width: 50cm, height: 30cm)
 
-#let brand = (
+#let brands = (
   _brand
     + (
       descriptor: "Chauffagiste - Clermont-Ferrand Sud",
       phone: "+33 4 23 50 06 41",
       print_card_n: 1, // one card is two sides, so this many of each
-      print_sheet_n: 4,
-    )
+    ),
 )
+
+// The signs on the way from the street to this door, one door sheet each.
+#let directions = ()
 
 #let nearby = (
   // The nearest doors that carry a name of their own, whatever they sell. One

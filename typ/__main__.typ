@@ -6,7 +6,7 @@
 
 #let _place = sys.inputs.at("place", default: none)
 #assert(_place != none, message: "no place; compile with --input place=/tmp/<place>.typ")
-#import _place: address, brands as _brands, lang, nearby, proprietaire, street_plate
+#import _place: address, brands as _brands, directions, lang, nearby, proprietaire, street_plate
 
 #let brands = _brands.map(resolve)
 
@@ -19,7 +19,15 @@
 #for brand in brands {
   assert(type(brand.descriptor) == str, message: brand.name + "'s descriptor is " + repr(brand.descriptor))
   assert(brand.print_card_n > 0, message: "no business cards asked for")
-  assert(brand.print_sheet_n > 0, message: "no door sheets asked for")
+}
+#assert(type(directions) == array, message: "directions is " + repr(directions) + ", not the signs on the way to the door")
+#for sign in directions {
+  assert(sign.len() > 0 and sign.keys().all(k => k in ("next_direction", "door")), message: "a sign is next_direction and/or door, not " + repr(sign))
+  if "next_direction" in sign {
+    assert.eq(sign.next_direction.keys().sorted(), ("arrow", "text"), message: "next_direction is " + repr(sign.next_direction))
+    assert(type(sign.next_direction.text) == str, message: "next_direction.text is " + repr(sign.next_direction.text))
+  }
+  if "door" in sign { assert(type(sign.door) == str, message: "door is " + repr(sign.door) + ", not what is written on it") }
 }
 #assert(nearby.print_my_address_n > 0, message: "no copies of the address plate asked for")
 #assert(nearby.other_businesses.len() > 0, message: "no boards of other businesses to draw")

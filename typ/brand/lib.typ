@@ -119,21 +119,89 @@
 
 #let cards(brand, n, lang, door: none) = range(n).map(_ => unit(box(_front(brand, lang, door) + _back(brand, lang, door))))
 
-#let poster(brand, lang, door: none) = unit(full_page: true, {
-  set page(paper: "a4", flipped: true, margin: 18mm, fill: white)
-  set text(font: "Liberation Sans", fill: _ink)
+#let _band-h = 46mm
+
+// The one arrow, drawn pointing right; every `sym.arrow.*` a place may name is a turn of it.
+#let _turns = (
+  (sym.arrow.r, 0deg),
+  (sym.arrow.br, 45deg),
+  (sym.arrow.b, 90deg),
+  (sym.arrow.bl, 135deg),
+  (sym.arrow.l, 180deg),
+  (sym.arrow.tl, -135deg),
+  (sym.arrow.t, -90deg),
+  (sym.arrow.tr, -45deg),
+)
+
+#let _arrow(glyph, size, fill) = {
+  let turn = _turns.find(((g, _)) => g == glyph)
+  assert(turn != none, message: "arrow " + str(glyph) + " is not one of " + _turns.map(((g, _)) => str(g)).join(" ") + ", the sym.arrow.{r,br,b,bl,l,tl,t,tr}")
+  rotate(turn.last(), reflow: true, box(width: size * 1.5, height: size, polygon(
+    fill: fill,
+    (0pt, size * 0.36),
+    (size * 0.85, size * 0.36),
+    (size * 0.85, 0pt),
+    (size * 1.5, size * 0.5),
+    (size * 0.85, size),
+    (size * 0.85, size * 0.64),
+    (0pt, size * 0.64),
+  )))
+}
+
+#let _band(brand, lang, sign) = rect(width: 100%, height: _band-h, inset: 0pt, fill: brand.primary, {
+  place(top, rect(width: 100%, height: 2.2mm, fill: brand.accent))
+  let parts = ()
+  if "next_direction" in sign {
+    let way = sign.next_direction
+    parts.push(stack(dir: ltr, spacing: 9mm, align(horizon, _arrow(way.arrow, 17mm, brand.accent)), align(horizon, fit(150mm, 30pt, sz => text(
+      size: sz,
+      weight: "bold",
+      tracking: sz / 15,
+      fill: white,
+      upper(way.text),
+    )))))
+  }
+  if "door" in sign {
+    parts.push(stack(dir: ttb, spacing: 4.5mm, align(center, text(size: 14pt, weight: "bold", tracking: 4pt, fill: brand.accent, tr((fr: "PORTE", en: "DOOR"), lang))), align(center, text(
+      size: 56pt,
+      weight: "bold",
+      fill: white,
+      top-edge: "cap-height",
+      bottom-edge: "baseline",
+      sign.door,
+    ))))
+  }
+  let rule = line(angle: 90deg, length: 26mm, stroke: 0.8pt + white.transparentize(65%))
+  place(center + horizon, dy: 1.1mm, stack(dir: ltr, spacing: 14mm, ..parts.map(p => align(horizon, p)).intersperse(align(horizon, rule))))
+})
+
+// `sign`: what this sheet points the way to, from the place's `directions`.
+#let poster(brand, lang, dark, door: none, sign: none) = unit(full_page: true, {
+  assert(not (dark and sign != none), message: "a sign's band is the brand's primary, so it vanishes on a dark sheet")
+  let ink = if dark { white } else { _ink }
+  set page(
+    paper: "a4",
+    flipped: true,
+    margin: (x: 18mm, top: 18mm, bottom: 18mm + if sign == none { 0mm } else { _band-h }),
+    fill: if dark { brand.primary } else { white },
+    background: if sign != none {
+      set text(font: "Liberation Sans")
+      place(bottom, _band(brand, lang, sign))
+    },
+  )
+  set text(font: "Liberation Sans", fill: ink)
   set par(leading: 0pt, spacing: 0pt)
   align(center + horizon, block(width: 100%, {
-    align(center, fit(200mm, 90pt, sz => _lockup(brand, sz, _ink)))
+    align(center, fit(200mm, 90pt, sz => _lockup(brand, sz, ink)))
     v(16mm)
     stack(
       dir: ttb,
       spacing: 6mm,
-      .._taglines(brand, lang, door, _ink).map(((s, fill)) => align(center, fit(200mm, 22pt, sz => text(size: sz, weight: "bold", tracking: sz * 0.18, fill: fill, upper(s))))),
+      .._taglines(brand, lang, door, ink).map(((s, fill)) => align(center, fit(200mm, 22pt, sz => text(size: sz, weight: "bold", tracking: sz * 0.18, fill: fill, upper(s))))),
     )
     let reached = ()
     if brand.phone != none { reached.push(align(center, fit(190mm, 58pt, sz => text(size: sz, weight: "bold", brand.phone)))) }
-    if brand.site != none { reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site))) }
+    if brand.site != none { reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: if dark { white.transparentize(35%) } else { _ink-soft }, brand.site))) }
     if reached.len() > 0 {
       v(20mm)
       stack(dir: ttb, spacing: 9mm, ..reached)

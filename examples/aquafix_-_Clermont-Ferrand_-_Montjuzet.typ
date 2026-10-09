@@ -23,14 +23,19 @@
 // What this door adds to the brand. For "Aquafix Plombier Chauffagiste - Lyon,
 // Nord", the brand is named "Aquafix" and `descriptor` is everything after it —
 // the trade is the same at every door, the territory is this one's.
-#let brand = (
+#let brands = (
   _brand
     + (
       descriptor: "Plombier Chauffagiste - Clermont-Ferrand",
       phone: "+33 7 57 69 12 38",
       print_card_n: 2, // one card is two sides, so this many of each; one names no door
-      print_sheet_n: 4,
-    )
+    ),
+)
+
+// The signs on the way from the street to this door, one door sheet each.
+#let directions = (
+  (next_direction: (arrow: sym.arrow.r, text: "À droite en entrant"), door: "003"), // outer door
+  (door: "003"), // block door
 )
 
 #let nearby = (
