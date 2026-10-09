@@ -6,7 +6,8 @@
 
 #let _place = sys.inputs.at("place", default: none)
 #assert(_place != none, message: "no place; compile with --input place=/tmp/<place>.typ")
-#import _place: address, brands as _brands, directions, lang, nearby, proprietaire, street_plate
+#import _place: address, brands as _brands, nearby, proprietaire, street_plate
+#import "/examples/main.typ": directions, lang
 
 #let brands = _brands.map(resolve)
 

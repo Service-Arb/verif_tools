@@ -16,8 +16,9 @@ is drawn with. `logo` prefers SVG but accepts any supported image under
 an emblem asset for the pipeline. A place imports one or more brand files and adds
 what its own door decides — the trade and territory line, the number it answers on
 when it has one, how many cards to print — so each brand reaches a sheet as one
-dictionary. The way to the door is the place's own `directions`, the same whoever
-hangs the sheet: one door sheet per sign on it. What can be checked from outside is optional and has no default:
+dictionary. What neither the business nor the door decides is the user's own,
+once, in `examples/main.typ`: the language, and the way to the door verification
+is passed at — one door sheet per sign on it. What can be checked from outside is optional and has no default:
 `phone` and `site` draw only where they are known, since a line that does not ring
 reads worse than one that is not there.
 

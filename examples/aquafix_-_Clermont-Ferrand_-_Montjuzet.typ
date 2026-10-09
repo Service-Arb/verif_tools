@@ -5,7 +5,6 @@
 // and the next one it takes.
 #import "/examples/brands/aquafix.typ": brand as _brand
 
-#let lang = "fr"
 #let proprietaire = "SCI Les Volcans"
 
 // `name` is what the plate on the building calls the place; the documents quote
@@ -30,12 +29,6 @@
       phone: "+33 7 57 69 12 38",
       print_card_n: 2, // one card is two sides, so this many of each; one names no door
     ),
-)
-
-// The signs on the way from the street to this door, one door sheet each.
-#let directions = (
-  (next_direction: (arrow: sym.arrow.r, text: "À droite en entrant"), door: "003"), // outer door
-  (door: "003"), // block door
 )
 
 #let nearby = (

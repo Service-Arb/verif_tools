@@ -175,7 +175,7 @@
   place(center + horizon, dy: 1.1mm, stack(dir: ltr, spacing: 14mm, ..parts.map(p => align(horizon, p)).intersperse(align(horizon, rule))))
 })
 
-// `sign`: what this sheet points the way to, from the place's `directions`.
+// `sign`: what this sheet points the way to, from `examples/main.typ`.
 #let poster(brand, lang, dark, door: none, sign: none) = unit(full_page: true, {
   assert(not (dark and sign != none), message: "a sign's band is the brand's primary, so it vanishes on a dark sheet")
   let ink = if dark { white } else { _ink }

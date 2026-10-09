@@ -3,7 +3,6 @@
 
 #import "/examples/brands/hexaclim.typ": brand as _brand
 
-#let lang = "fr"
 #let proprietaire = "SCI Les Volcans"
 
 // `name` is what the plate on the building calls the place; the documents quote
@@ -26,9 +25,6 @@
       print_card_n: 1, // one card is two sides, so this many of each
     ),
 )
-
-// The signs on the way from the street to this door, one door sheet each.
-#let directions = ()
 
 #let nearby = (
   // The nearest doors that carry a name of their own, whatever they sell. One
