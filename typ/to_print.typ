@@ -20,11 +20,14 @@
 
 #let brand_sheets = (
   brands
-    .map(brand => (
-      ..range(brand.print_sheet_n).map(_ => poster(brand)),
-      ..cards(brand, brand.print_card_n - 1),
-      ..cards(brand, 1, generic: true),
-    ))
+    .map(brand => {
+      let door = (descriptor: brand.descriptor, street: address.street, city: address.city)
+      (
+        ..range(brand.print_sheet_n).map(_ => poster(brand, lang, door: door)),
+        ..cards(brand, brand.print_card_n - 1, lang, door: door),
+        ..cards(brand, 1, lang),
+      )
+    })
     .flatten()
 )
 

@@ -92,14 +92,27 @@
                         # was first built on; `__impure = true` if it has to follow the day
                         unset SOURCE_DATE_EPOCH
 
+                        render() {
+                          mkdir -p "$(dirname "$2")"
+                          typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
+                            --font-path ${pkgs.liberation_ttf}/share/fonts/truetype "$@"
+                          one-sided "$2"
+                        }
+                        langs=$(typst eval --root . '{ import "/typ/utils.typ": langs; langs.join(" ") }' | tr -d '"')
+
             for f in $(find typ -name '*.typ'); do
                           if grep -qxF "$(realpath -m "$f")" imported; then continue; fi
                           ${pkgs.lib.optionalString (place == null) ''if grep -qxF "$(realpath -m "$f")" placed; then continue; fi''}
-                          mkdir -p "$out/$(dirname "$f")"
-                          typst compile --root . --ignore-system-fonts ${pkgs.lib.optionalString (place != null) "--input place=${place}"} \
-                            --font-path ${pkgs.liberation_ttf}/share/fonts/truetype \
-                            "$f" "$out/''${f%.typ}.pdf"
-                          one-sided "$out/''${f%.typ}.pdf"
+                          case "$f" in
+                            # a brand before its door, once per brand file and language
+                            typ/brand/stock.typ)
+                              for b in examples/brands/*.typ; do
+                                for l in $langs; do
+                                  render "$f" "$out/typ/brand/$(basename "$b" .typ).$l.pdf" --input brand="/$b" --input lang="$l"
+                                done
+                              done ;;
+                            *) render "$f" "$out/''${f%.typ}.pdf" ;;
+                          esac
                         done
           '';
 
@@ -138,9 +151,6 @@
             }))
             files);
         places = placesIn "examples" // placesIn "tmp";
-
-        # A place owns one pack; its brand list is rendered inside that pack.
-
 
         # The stock a door draws from before it is a particular door.
         typ-unplaced = sheets { name = "${pname}-typ"; };
@@ -213,7 +223,7 @@
           type = "app";
           program = "${pkgs.writeShellScriptBin "help" ''
             cat <<EOF
-            nix build .#typ               The signs no door decides, in every language
+            nix build .#typ               The signs no door decides, and every brand, in every language
             nix build "path:.#<place>"    Every sheet for that door: result/typ/to_print.pdf
             nix run . -- <place.typ>      The same to_print.pdf, in your downloads or -o DIR
             nix run .#live -- submit -h   Fill a place's verification form in a logged-in Chrome

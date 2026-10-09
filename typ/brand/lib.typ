@@ -1,12 +1,45 @@
 // What the business prints for itself: the sheet that goes on a door or a van,
-// and the card. The brand is explicit so several businesses can share one place.
-#import "../__main__.typ": address, lang
+// and the card. Nothing here names a place, so `.#typ` can draw a brand before it
+// has a door; `door` is what one adds — its `descriptor`, `street` and `city`.
 #import "../utils.typ": fit, tr, unit
+
+#let _defaults = (
+  primary: rgb("#0a2540"),
+  accent: rgb("#c2703d"),
+  logo: none,
+  name_segments: none,
+  phone: none,
+  site: none,
+  trade: none,
+  promise: none,
+)
+
+// A brand file as the sheets take it.
+#let resolve(brand) = {
+  let brand = _defaults + brand
+  let keys = brand.keys()
+  assert(
+    ("accent", "email", "logo", "name", "name_segments", "person", "phone", "primary", "promise", "site", "trade").all(key => key in keys),
+    message: "brand is missing a required field: " + repr(keys.sorted()),
+  )
+  for k in ("primary", "accent") { assert(type(brand.at(k)) == color, message: "brand." + k + " is " + repr(brand.at(k)) + ", not a colour") }
+  assert(brand.logo == none or type(brand.logo) == str, message: "brand.logo is " + repr(brand.logo) + ", not an image path from the repo root")
+  assert(brand.name_segments == none or type(brand.name_segments) == array, message: "brand.name_segments must be an array of styled text segments")
+  for k in ("phone", "site") {
+    assert(
+      brand.at(k) == none or type(brand.at(k)) == str,
+      message: "brand." + k + " is " + repr(brand.at(k)) + "; leave it out rather than invent one",
+    )
+  }
+  for k in ("trade", "promise") {
+    assert(brand.at(k) == none or type(brand.at(k)) == dictionary, message: "brand." + k + " is " + repr(brand.at(k)) + ", not text keyed by language")
+  }
+  brand
+}
 
 #let _ink = rgb("#051726")
 #let _ink-soft = rgb("#5a6b7c")
 #let _hairline = rgb("#dce3ea")
-#let _labels = tr((fr: ("DIRECT", "COURRIEL", "SITE"), en: ("DIRECT", "EMAIL", "WEB")), lang)
 #let _card-w = 85mm
 #let _card-h = 55mm
 
@@ -36,16 +69,17 @@
   _mark(brand, size * 1.25, brand.accent), _name(brand, size, fill),
 )
 
-// `generic` names no door: the brand's own lines stand where the descriptor and
-// the address would.
-#let _front(brand, generic) = box(width: _card-w, height: _card-h, fill: brand.primary, {
+// Without a door, the brand's own lines stand where the descriptor would; the
+// second is set in `rest`.
+#let _taglines(brand, lang, door, rest) = if door == none {
+  (brand.trade, brand.promise).zip((brand.accent, rest)).filter(((s, _)) => s != none).map(((s, fill)) => (tr(s, lang), fill))
+} else {
+  ((door.descriptor, brand.accent),)
+}
+
+#let _front(brand, lang, door) = box(width: _card-w, height: _card-h, fill: brand.primary, {
   set text(font: "Liberation Sans")
-  let row(s, fill) = align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: fill, upper(s))))
-  let lines = if generic {
-    (brand.trade, brand.promise).zip((brand.accent, white)).filter(((s, _)) => s != none).map(((s, fill)) => row(tr(s, lang), fill))
-  } else {
-    (row(brand.descriptor, brand.accent),)
-  }
+  let lines = _taglines(brand, lang, door, white).map(((s, fill)) => align(center, fit(66mm, 7pt, sz => text(size: sz, weight: "medium", tracking: sz * 0.2, fill: fill, upper(s)))))
   place(center + horizon, stack(
     dir: ttb,
     spacing: 7mm,
@@ -54,7 +88,7 @@
   ))
 })
 
-#let _back(brand, generic) = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
+#let _back(brand, lang, door) = box(width: _card-w, height: _card-h, fill: white, stroke: 0.4pt + _hairline, {
   set text(font: "Liberation Sans", fill: _ink)
   place(top + left, rect(width: _card-w, height: 2mm, fill: brand.accent))
   place(top + left, block(inset: (x: 7mm, top: 5mm), {
@@ -67,7 +101,7 @@
       column-gutter: 3mm,
       row-gutter: 1.6mm,
       align: horizon,
-      .._labels
+      ..tr((fr: ("DIRECT", "COURRIEL", "SITE"), en: ("DIRECT", "EMAIL", "WEB")), lang)
         .zip((brand.phone, brand.email, brand.site))
         .filter(((_, v)) => v != none)
         .map(((l, v)) => (
@@ -77,22 +111,26 @@
         .flatten()
     )
   }))
-  if not generic {
+  if door != none {
     place(bottom + left, dx: 7mm, dy: -8.5mm, line(length: _card-w - 14mm, stroke: 0.4pt + _hairline))
-    place(bottom + left, dx: 7mm, dy: -6mm, text(size: 6.5pt, fill: _ink-soft, address.street + "  ·  " + address.city))
+    place(bottom + left, dx: 7mm, dy: -6mm, text(size: 6.5pt, fill: _ink-soft, door.street + "  ·  " + door.city))
   }
 })
 
-#let cards(brand, n, generic: false) = range(n).map(_ => unit(box(_front(brand, generic) + _back(brand, generic))))
+#let cards(brand, n, lang, door: none) = range(n).map(_ => unit(box(_front(brand, lang, door) + _back(brand, lang, door))))
 
-#let poster(brand) = unit(full_page: true, {
+#let poster(brand, lang, door: none) = unit(full_page: true, {
   set page(paper: "a4", flipped: true, margin: 18mm, fill: white)
   set text(font: "Liberation Sans", fill: _ink)
   set par(leading: 0pt, spacing: 0pt)
   align(center + horizon, block(width: 100%, {
     align(center, fit(200mm, 90pt, sz => _lockup(brand, sz, _ink)))
     v(16mm)
-    align(center, fit(200mm, 22pt, sz => text(size: sz, weight: "bold", tracking: sz * 0.18, fill: brand.accent, upper(brand.descriptor))))
+    stack(
+      dir: ttb,
+      spacing: 6mm,
+      .._taglines(brand, lang, door, _ink).map(((s, fill)) => align(center, fit(200mm, 22pt, sz => text(size: sz, weight: "bold", tracking: sz * 0.18, fill: fill, upper(s))))),
+    )
     let reached = ()
     if brand.phone != none { reached.push(align(center, fit(190mm, 58pt, sz => text(size: sz, weight: "bold", brand.phone)))) }
     if brand.site != none { reached.push(align(center, text(size: 24pt, weight: "medium", tracking: 2.2pt, fill: _ink-soft, brand.site))) }
