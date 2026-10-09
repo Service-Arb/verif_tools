@@ -3,7 +3,6 @@
 #import "/examples/brands/aerotherm63.typ": brand as aerotherm
 #import "/examples/brands/toitvolcan.typ": brand as toitvolcan
 
-#let lang = "fr"
 #let proprietaire = "SCI Les Volcans"
 #let address = (
   name: "CMF 003",
@@ -37,8 +36,6 @@
       print_card_n: 2,
     ),
 )
-#let directions = ()
-
 #let nearby = (
   other_businesses: (
     "Le Doyenné de l'Oradou\nÉquipement social",
