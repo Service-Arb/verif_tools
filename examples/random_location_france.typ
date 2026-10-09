@@ -3,8 +3,6 @@
 
 #import "/examples/brands/hexaclim.typ": brand as _brand
 
-#let proprietaire = "SCI Les Volcans"
-
 // `name` is what the plate on the building calls the place; the documents quote
 // street and city as the one line a notary would write.
 #let address = (
@@ -15,14 +13,11 @@
 
 // The enamel blank the street plate at this door is cut from. Its height sets how
 // tall the letters to cut out come off the paper; the width records the blank.
-#let street_plate = (width: 50cm, height: 30cm)
-
 #let brands = (
   _brand
     + (
       descriptor: "Chauffagiste - Clermont-Ferrand Sud",
       phone: "+33 4 23 50 06 41",
-      print_card_n: 1, // one card is two sides, so this many of each
     ),
 )
 
@@ -38,5 +33,4 @@
   neighbours: (
     (name: "Résidence des Cézeaux", street: "25 avenue des Landais"),
   ),
-  print_my_address_n: 3,
 )

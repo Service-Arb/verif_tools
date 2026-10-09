@@ -2,7 +2,7 @@
 // One pass through the printer. Add to `sheets`; `pack` lays what wants a page of
 // its own first and tiles the rest onto what is left, so nothing here has to know
 // what sits above it.
-#import "__main__.typ": address, brands, directions, lang, street_plate
+#import "__main__.typ": address, brands, directions, lang, print_card_n, street_plate
 #import "utils.typ": pack, recent-date
 #import "brand/lib.typ": cards, poster
 #import "documents/attestation_interdiction_enseigne.typ": attestation
@@ -26,7 +26,7 @@
         ..directions.map(sign => poster(brand, lang, false, door: door, sign: sign)),
         poster(brand, lang, false, door: door),
         poster(brand, lang, true, door: door),
-        ..cards(brand, brand.print_card_n - 1, lang, door: door),
+        ..cards(brand, print_card_n - 1, lang, door: door),
         ..cards(brand, 1, lang),
       )
     })

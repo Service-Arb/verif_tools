@@ -61,7 +61,7 @@ def blue(sheet, x, y):
 
 # Trimmed to its blue and glued, the sheets have to come out exactly as wide as the
 # plate: where the last one's blue stops is where the plate ends.
-width = float(re.search(r"street_plate = \(width: ([\d.]+)cm", open("." + place).read()).group(1)) * 10
+width = float(re.search(r"street_plate = \(width: ([\d.]+)cm", open("examples/main.typ").read()).group(1)) * 10
 last = sheets[-1]
 y = px(5) # above the letters
 edge = 1 + max(x for x in range(last[1]) if blue(last, x, y))

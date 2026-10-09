@@ -10,7 +10,6 @@ description: Turn an address into a printable verification pack — write tmp/<p
 | field | |
 | --- | --- |
 | `address.street`, `address.city` | the postal line |
-| `proprietaire` | landlord on the attestation and the rent invoice |
 | `brands[].descriptor` | each trade and territory line under its name |
 
 The business itself is a file, not a field — `examples/brands/<brand>.typ`, one
@@ -98,13 +97,10 @@ An SVG written with `fill="currentColor"` comes out in `accent` wherever it land
 which is what `assets/logos/aquafix.svg` is. Prefer that for a one- or two-colour
 emblem; hand a full-colour raster over as it is when extraction would lose detail.
 
-`print_my_address_n` is `3`, `brand.print_card_n` is `2`,
-`street_plate` is `(width: 50cm, height: 30cm)` —
-the blank the street plate is cut from, and so both how tall its letters are and
-how many A4 sheets it spans — unless the user says otherwise.
-The rest of the letterhead — address, e-mail, SIREN, signatory — is fixed in
-`typ/documents/bailleur.typ` to `SCI Les Volcans`, so `proprietaire` is that name
-unless the user gives their own landlord.
+What does not change from door to door — `lang`, `proprietaire`, `street_plate`,
+`print_card_n`, `print_my_address_n`, `directions` — is the user's, once, in
+`examples/main.typ`; a place file never sets them. The rest of the letterhead —
+address, e-mail, SIREN, signatory — is fixed in `typ/documents/bailleur.typ`.
 
 ## 2. Look up the rest
 
@@ -143,21 +139,18 @@ Use `Plumbing`, `House-Cleaning`, and similar stable English service labels for
 When the service area contains several words, keep them as words joined by
 hyphens inside that field; reserve `_-_` for the four filename fields.
 
-One place file may import several brand files. Keep the place-derived address,
-nearby businesses, landlord and print counts in the place file, and add each
-brand's place-specific descriptor and counts to `brands`:
+One place file may import several brand files. Keep the place-derived address
+and nearby businesses in the place file, and add each brand's place-specific
+descriptor and phone to `brands`:
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as aquafix
 #import "/examples/brands/serrunova.typ": brand as serrunova
 #let brands = (
-  aquafix + (descriptor: ..., phone: none, print_card_n: 2),
-  serrunova + (descriptor: ..., phone: none, print_card_n: 2),
+  aquafix + (descriptor: ..., phone: none),
+  serrunova + (descriptor: ..., phone: none),
 )
 ```
-
-A place has no `lang` or `directions`: those are the user's, not the door's, and
-every pack takes them from `examples/main.typ`.
 
 A physical location has one place file and one `to_print.pdf`. Shared place
 sheets are rendered once; each configured brand then contributes its own posters
@@ -170,7 +163,7 @@ folder is required.
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as aquafix
-#let brands = (aquafix + (descriptor: ..., phone: none, print_card_n: 2))
+#let brands = (aquafix + (descriptor: ..., phone: none))
 ```
 
 Each brand file remains under `examples/brands/` so another place can import it.

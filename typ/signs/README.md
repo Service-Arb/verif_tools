@@ -56,7 +56,7 @@ white edge.
 direct path (`typst compile --input bleed=0.4 …`); `nix build` takes no argument
 and keeps them.
 
-The place gives the blank the plate is cut from — `street_plate`, 50×30cm being
+`examples/main.typ` gives the blank the plate is cut from — `street_plate`, 50×30cm being
 what the émailleurs sell — and the caps are a fraction of its height, 0.211. That
 fraction is measured off the reference photo of `6ème ARRᵗ / AVENUE THIERS` rather
 than specified anywhere: no national standard fixes it, and Lyon's plates are a

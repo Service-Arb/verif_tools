@@ -1,4 +1,4 @@
-// The landlord as their own paper has them. The place file names them; everything
+// The landlord as their own paper has them. `examples/main.typ` names them; everything
 // below is the letterhead that the same name signs every sheet with, so two
 // documents in one envelope agree on the address, the SIREN and the hand.
 #import "../__main__.typ": proprietaire

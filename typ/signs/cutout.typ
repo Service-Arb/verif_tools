@@ -1,6 +1,6 @@
 // The hand-cut fallback: caps to cut out one by one and glue onto a blue
 // background, for when the plate cannot be printed whole (`plate.typ`).
-#import "../__main__.typ": street_plate
+#import "/examples/main.typ": street_plate
 #import "../utils.typ": margin, unit
 #import "plate.typ": cap_frac
 

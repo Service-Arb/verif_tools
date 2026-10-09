@@ -5,8 +5,6 @@
 // and the next one it takes.
 #import "/examples/brands/aquafix.typ": brand as _brand
 
-#let proprietaire = "SCI Les Volcans"
-
 // `name` is what the plate on the building calls the place; the documents quote
 // street and city as the one line a notary would write.
 #let address = (
@@ -15,9 +13,6 @@
   city: "63100 Clermont-Ferrand",
 )
 
-// The enamel blank the street plate at this door is cut from. Its height sets how
-// tall the letters to cut out come off the paper; the width records the blank.
-#let street_plate = (width: 50cm, height: 30cm)
 
 // What this door adds to the brand. For "Aquafix Plombier Chauffagiste - Lyon,
 // Nord", the brand is named "Aquafix" and `descriptor` is everything after it —
@@ -27,7 +22,6 @@
     + (
       descriptor: "Plombier Chauffagiste - Clermont-Ferrand",
       phone: "+33 7 57 69 12 38",
-      print_card_n: 2, // one card is two sides, so this many of each; one names no door
     ),
 )
 
@@ -45,5 +39,4 @@
   neighbours: (
     (name: "Résidence Bel Horizon", street: "31 bis rue des Chanelles"), // 19m
   ),
-  print_my_address_n: 3,
 )
