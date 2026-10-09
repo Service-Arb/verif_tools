@@ -99,7 +99,7 @@ which is what `assets/logos/aquafix.svg` is. Prefer that for a one- or two-colou
 emblem; hand a full-colour raster over as it is when extraction would lose detail.
 
 `lang` is `"fr"`, `print_my_address_n` is `3`, `brand.print_card_n` is `2`,
-`brand.print_sheet_n` is `4` and `street_plate` is `(width: 50cm, height: 30cm)` —
+`directions` is `()` and `street_plate` is `(width: 50cm, height: 30cm)` —
 the blank the street plate is cut from, and so both how tall its letters are and
 how many A4 sheets it spans — unless the user says otherwise.
 The rest of the letterhead — address, e-mail, SIREN, signatory — is fixed in
@@ -151,8 +151,14 @@ brand's place-specific descriptor and counts to `brands`:
 #import "/examples/brands/aquafix.typ": brand as aquafix
 #import "/examples/brands/serrunova.typ": brand as serrunova
 #let brands = (
-  aquafix + (descriptor: ..., phone: none, print_card_n: 2, print_sheet_n: 4),
-  serrunova + (descriptor: ..., phone: none, print_card_n: 2, print_sheet_n: 4),
+  aquafix + (descriptor: ..., phone: none, print_card_n: 2),
+  serrunova + (descriptor: ..., phone: none, print_card_n: 2),
+)
+// One door sheet per sign on the way in; each sign has `next_direction` and/or `door`,
+// the arrow one of `sym.arrow.{r,l,t,b,tr,tl,br,bl}`, the text in `lang`.
+#let directions = (
+  (next_direction: (arrow: sym.arrow.r, text: "À droite en entrant"), door: "003"),
+  (door: "003"),
 )
 ```
 
@@ -167,7 +173,7 @@ folder is required.
 
 ```typst
 #import "/examples/brands/aquafix.typ": brand as aquafix
-#let brands = (aquafix + (descriptor: ..., phone: none, print_card_n: 2, print_sheet_n: 4))
+#let brands = (aquafix + (descriptor: ..., phone: none, print_card_n: 2))
 ```
 
 Each brand file remains under `examples/brands/` so another place can import it.
@@ -189,8 +195,8 @@ nix run . -- tmp/<place>.typ
 
 The command writes the PDF to `~/Downloads/verif_prints/<place>.pdf`, where `/submit-live` looks for it.
 Pass `-o DIR` only when a different output folder is required. The PDF contains
-one shared set of place-derived sheets, followed by each brand's posters and
-cards.
+one shared set of place-derived sheets, followed by each brand's door sheets — one
+per sign in `directions`, then a plain one on white and one on dark — and cards.
 
 Hand over the path it ends at, and say what is on it: the street plate, the
 attestation, the rent invoice addressed to the location, our address plate tiled,
